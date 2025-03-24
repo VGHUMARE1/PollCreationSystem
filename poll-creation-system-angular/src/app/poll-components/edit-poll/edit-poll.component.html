@@ -1,0 +1,67 @@
+<div class="container mt-4">
+    <div class="card custom-card p-4">
+      <h3 class="text-center text-accent mb-3">Edit Poll</h3>
+  
+      <!-- Question Input -->
+      <div class="mb-3">
+        <label for="question" class="form-label">Poll Question</label>
+        <input
+          type="text"
+          id="question"
+          [(ngModel)]="poll.question"
+          class="form-control"
+          placeholder="Enter your question"
+          required
+        />
+      </div>
+  
+      <!-- Options List -->
+      <div *ngFor="let option of poll.options; let i = index" class="input-group mb-2">
+        <input
+          type="text"
+          [(ngModel)]="poll.options[i]"
+          class="form-control"
+          placeholder="Enter option"
+          required
+        />
+        <button
+          class="btn btn-danger"
+          (click)="removeOption(i)"
+          *ngIf="poll.options.length > 2"
+        >
+          ✖
+        </button>
+      </div>
+  
+      <!-- Add Option Button -->
+      <button class="btn btn-accent mb-3" (click)="addOption()">➕ Add Option</button>
+  
+      <!-- Poll Expiry Date and Time -->
+      <div class="mb-3">
+        <label for="expiryDateTime" class="form-label">Poll Expiry Date & Time</label>
+        <input
+          type="datetime-local"
+          id="expiryDateTime"
+          [(ngModel)]="poll.expiryDate"
+          class="form-control"
+          required
+        />
+      </div>
+  
+      <!-- Toggle Switch for Multiple Selections -->
+      <div class="form-check form-switch text-center">
+        <input
+          type="checkbox"
+          id="multiSelectSwitch"
+          [(ngModel)]="poll.allowMultiple"
+          class="form-check-input"
+        />
+        <label for="multiSelectSwitch" class="form-check-label ms-2"
+          >Allow multiple selections</label
+        >
+      </div>
+  
+      <!-- Submit Poll Button -->
+      <button class="btn btn-success w-100 mt-3" (click)="submitPoll()">Save Changes</button>
+    </div>
+  </div>

@@ -1,0 +1,66 @@
+/* Centering the form */
+.register-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: #393E46;
+    color: #EEEEEE;
+    padding: 20px;
+    margin: 50px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  
+  /* Styling the form elements */
+  form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: #EEEEEE;
+    color: #222831;
+    font-size: 16px;
+  }
+  
+  /* Button Styles */
+  button {
+    background-color: #00ADB5;
+    color: #EEEEEE;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: 5px;
+    transition: 0.3s ease-in-out;
+  }
+  
+  button:hover {
+    background-color: #222831;
+  }
+  
+  button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+  }
+  
+  /* Error Message Styling */
+  .error {
+    color: #ff4d4d;
+    font-size: 14px;
+    text-align: left;
+    margin-bottom: 5px;
+  }
+  
+  /* Success Message */
+  .message {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #00ADB5;
+  }
+  

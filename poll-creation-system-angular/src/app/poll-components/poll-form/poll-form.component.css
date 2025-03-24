@@ -1,0 +1,37 @@
+/* Page Background */
+/* Center the form and reduce its width */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5rem;
+  }
+  
+  .custom-card {
+    width: 50%; /* Adjust width (reduce for smaller size) */
+    max-width: 500px; /* Prevent it from getting too wide */
+    background-color: #393E46;
+    color: #EEEEEE;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Form Inputs */
+  .form-control {
+    background-color: #EEEEEE;
+    color: #222831;
+    border: 1px solid #00ADB5;
+    border-radius: 5px;
+  }
+  
+  /* Buttons */
+  .btn-accent {
+    background-color: #00ADB5;
+    color: #EEEEEE;
+    border: none;
+  }
+  
+  .btn-accent:hover, .btn-success:hover {
+    background-color: #008C9E;
+  }
+  

@@ -1,0 +1,38 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+}
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: #eeeeee;
+}
+.container-fluid {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  background-color: #222831;
+  font-family: Arial, sans-serif;
+}
+
+.sidebar {
+  background-color: #393e46;
+  color: #eeeeee;
+  height: 100vh;
+  padding: 20px;
+}
+
+.main-content {
+  background-color: #eeeeee;
+  min-height: 90vh;
+  padding: 20px;
+}
+

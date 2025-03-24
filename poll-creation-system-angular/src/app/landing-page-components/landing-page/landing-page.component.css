@@ -1,0 +1,111 @@
+/* General Styling */
+.landing-container {
+  text-align: center;
+  font-family: 'Poppins', sans-serif;
+  color: #fff;
+  background: #222831;
+  padding: 20px;
+}
+
+/* Hero Section */
+.hero-section {
+  background: linear-gradient(135deg, rgba(0, 173, 181, 0.8), rgba(57, 62, 70, 0.8));
+  padding: 70px 20px;
+  border-radius: 15px;
+  margin-bottom: 40px;
+  box-shadow: 0px 8px 20px rgba(0, 173, 181, 0.5);
+  transition: transform 0.3s ease-in-out;
+}
+
+.hero-section:hover {
+  transform: scale(1.02);
+}
+
+.hero-section h1 {
+  font-size: 2.8rem;
+  font-weight: bold;
+}
+
+.hero-section p {
+  font-size: 1.3rem;
+  margin: 15px 0;
+}
+
+/* Buttons */
+.btn {
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00adb5, #005f63);
+  color: #fff;
+  box-shadow: 0px 4px 10px rgba(0, 173, 181, 0.5);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #eeeeee, #aaaaaa);
+  color: #222831;
+}
+
+.btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0px 6px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Features Section */
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 50px;
+}
+
+.feature {
+  background: rgba(57, 62, 70, 0.4);
+  padding: 25px;
+  border-radius: 15px;
+  width: 320px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0px 8px 15px rgba(0, 173, 181, 0.3);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.feature:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 10px 20px rgba(0, 173, 181, 0.5);
+}
+
+/* Feature Images */
+.feature img {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 15px;
+  border-radius: 20px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.feature:hover img {
+  transform: rotate(5deg);
+}
+
+/* Call to Action */
+.cta-section {
+  background: linear-gradient(135deg, #00adb5, #393e46);
+  padding: 50px 20px;
+  border-radius: 15px;
+  margin-top: 50px;
+  box-shadow: 0px 8px 20px rgba(0, 173, 181, 0.5);
+}
+
+.cta-section h2 {
+  font-size: 2rem;
+  margin-bottom: 25px;
+}

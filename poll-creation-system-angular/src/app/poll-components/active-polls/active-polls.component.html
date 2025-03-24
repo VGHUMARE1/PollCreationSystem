@@ -1,0 +1,42 @@
+<div class="container">
+  <h2 class="text-accent text-center">Active Polls</h2>
+
+  <div class="polls-grid">
+    <div *ngFor="let poll of activePolls" class="poll-card">
+      <h5 class="poll-title">{{ poll.question }}</h5>
+
+      <!-- Poll Options -->
+      <div *ngFor="let option of poll.options; let i = index" class="form-check poll-option">
+        <!-- Checkbox for multiple-choice polls -->
+        <input
+          *ngIf="poll.allowMultiple"
+          type="checkbox"
+          [name]="'poll' + poll._id"
+          [value]="option"
+          [(ngModel)]="poll.selectedOptions[i]"
+          class="form-check-input" />
+
+        <!-- Radio button for single-choice polls -->
+        <input
+          *ngIf="!poll.allowMultiple"
+          type="radio"
+          [name]="'poll' + poll._id"
+          [value]="option"
+          [(ngModel)]="poll.selectedOption"
+          class="form-check-input" />
+
+        <label class="form-check-label">{{ option }}</label>
+      </div>
+
+      <!-- Submit Vote Button -->
+      <button class="btn btn-success vote-btn" (click)="vote(poll)">Vote</button>
+
+      <!-- Poll Details -->
+      <div class="poll-details">
+        <p>👤 <span>{{ poll.createdBy }}</span></p>
+        <p>⏳ <span>{{ poll.expiryDate }}</span></p>
+        <p>📊 <span>{{ poll.totalVotes }} votes</span></p>
+      </div>
+    </div>
+  </div>
+</div>

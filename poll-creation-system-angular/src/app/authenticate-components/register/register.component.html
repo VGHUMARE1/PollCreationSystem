@@ -1,0 +1,38 @@
+<div class="register-container">
+  <h2>Register</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="register()">
+
+    <!-- First Name -->
+    <input type="text" placeholder="First Name" formControlName="fname" />
+    <div class="error" *ngIf="isInvalid('fname')">First Name is required (Min 2 chars)</div>
+
+    <!-- Last Name -->
+    <input type="text" placeholder="Last Name" formControlName="lname" />
+    <div class="error" *ngIf="isInvalid('lname')">Last Name is required (Min 2 chars)</div>
+
+    <!-- Email -->
+    <input type="email" placeholder="Email" formControlName="email" (input)="checkEmailExists()" />
+    <div class="error" *ngIf="isInvalid('email')">Valid Email is required</div>
+    <div class="error" *ngIf="emailExists">Email already exists!</div>
+
+    <!-- Password -->
+    <input type="password" placeholder="Password" formControlName="password" />
+    <div class="error" *ngIf="isInvalid('password')">Password must be at least 6 characters</div>
+
+    <!-- Confirm Password -->
+    <input type="password" placeholder="Confirm Password" formControlName="confirmPassword" />
+    <div class="error" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched">
+      Passwords do not match
+    </div>
+
+    <!-- Phone Number -->
+    <input type="text" placeholder="Phone Number" formControlName="phoneNumber" />
+    <div class="error" *ngIf="isInvalid('phoneNumber')">Enter a valid 10-digit phone number</div>
+
+    <!-- Submit Button -->
+    <button type="submit" [disabled]="registerForm.invalid || emailExists">Register</button>
+  </form>
+
+  <!-- Display Message -->
+  <p class="message">{{ message }}</p>
+</div>

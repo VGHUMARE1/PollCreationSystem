@@ -1,0 +1,83 @@
+body {
+  background-color: #222831;
+  color: #EEEEEE;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  color: #00ADB5;
+  font-weight: bold;
+  text-transform: uppercase;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Poll Card Styling */
+.poll-card {
+  background-color: #393E46;
+  color: #EEEEEE;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.poll-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0px 10px 20px rgba(0, 173, 181, 0.3);
+}
+
+.text-muted {
+  color: #b3b1b1 !important;
+}
+
+/* Single Action Button */
+.btn-analysis {
+  background-color: #00ADB5;
+  color: #EEEEEE;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: 0.3s ease-in-out;
+}
+
+.btn-analysis:hover {
+  opacity: 0.85;
+  transform: scale(1.05);
+}
+
+/* Pagination Controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-nav {
+  background-color: #6C757D;
+  color: #EEEEEE;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: 0.3s ease-in-out;
+}
+
+.btn-nav:disabled {
+  opacity: 0.5;
+}
+
+.page-indicator {
+  font-size: 16px;
+  font-weight: bold;
+  color: #00ADB5;
+}

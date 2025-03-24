@@ -1,0 +1,11 @@
+.container-fluid {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0%;
+}
+.main-content {
+  /* background-color: #eeeeee; */
+  flex-grow: 1;
+  padding: 20px;
+}

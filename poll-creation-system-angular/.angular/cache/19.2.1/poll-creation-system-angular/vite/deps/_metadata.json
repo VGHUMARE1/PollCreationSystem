@@ -1,0 +1,70 @@
+{
+  "hash": "bf2def30",
+  "configHash": "bffff47f",
+  "lockfileHash": "ae12b23c",
+  "browserHash": "a0fec366",
+  "optimized": {
+    "@angular/common": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "a62146bf",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "ef34b4a8",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "05fdcb1d",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "f5161acd",
+      "needsInterop": false
+    },
+    "@angular/router": {
+      "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
+      "file": "@angular_router.js",
+      "fileHash": "1919cba2",
+      "needsInterop": false
+    },
+    "axios": {
+      "src": "../../../../../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "d5f0c68d",
+      "needsInterop": false
+    },
+    "crypto-js": {
+      "src": "../../../../../../node_modules/crypto-js/index.js",
+      "file": "crypto-js.js",
+      "fileHash": "100881f0",
+      "needsInterop": true
+    },
+    "ngx-cookie-service": {
+      "src": "../../../../../../node_modules/ngx-cookie-service/fesm2022/ngx-cookie-service.mjs",
+      "file": "ngx-cookie-service.js",
+      "fileHash": "68630c20",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-EAJFKBAI": {
+      "file": "chunk-EAJFKBAI.js"
+    },
+    "chunk-YRZQJ2OD": {
+      "file": "chunk-YRZQJ2OD.js"
+    },
+    "chunk-DRINV2OJ": {
+      "file": "chunk-DRINV2OJ.js"
+    },
+    "chunk-RJX5MCQ2": {
+      "file": "chunk-RJX5MCQ2.js"
+    }
+  }
+}

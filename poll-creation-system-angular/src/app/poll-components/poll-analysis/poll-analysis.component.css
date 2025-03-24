@@ -1,0 +1,50 @@
+
+.poll-analysis-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #393E46;
+    color: #EEEEEE;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .chart-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .voters-list {
+    margin-top: 20px;
+  }
+  
+  .btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .btn {
+    font-size: 14px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.3s ease-in-out;
+  }
+  
+  .btn-edit {
+    background-color: #00ADB5;
+    color: #EEEEEE;
+  }
+  
+  .btn-delete {
+    background-color: #D9534F;
+    color: #EEEEEE;
+  }
+  
+  .btn-toggle {
+    background-color: #FFBF00;
+    color: #222831;
+  }
