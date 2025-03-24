@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "axios": "^1.8.2",
+    "ngx-cookie-service": "^19.1.2"
+  }
+}
