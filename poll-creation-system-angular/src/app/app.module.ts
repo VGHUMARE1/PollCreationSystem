@@ -8,10 +8,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { CookieService } from 'ngx-cookie-service';
 import { AppRoutingModule } from './app.routes';
 
-import { ChartsModule } from 'ng2-charts';
+// import { ChartsModule } from 'ng2-charts';
 @NgModule({
   declarations: [AppComponent, LoginComponent, RegisterComponent, DashboardComponent],
-  imports: [BrowserModule, AppRoutingModule, FormsModule,ChartsModule],
+  imports: [BrowserModule, AppRoutingModule, FormsModule],
   providers: [CookieService],
   bootstrap: [AppComponent],
 })

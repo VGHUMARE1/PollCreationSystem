@@ -1,42 +1,58 @@
+<div class="poll-container">
+  <h2 class="poll-title">{{ poll?.question }}</h2>
+  
+  <div class="poll-meta">
+    <p><strong>Created By:</strong> {{ pollCreator.name }} ({{ pollCreator.email }})</p>
+    <p><strong>Status:</strong> <span class="status-badge">{{ poll?.status | uppercase }}</span></p>
+  </div>
 
-<div class="poll-analysis-container">
-    <h2 class="text-center">Poll Analysis</h2>
-    <p><strong>Question:</strong> {{ poll?.question }}</p>
-    <p><strong>Created By:</strong> {{ poll?.creatorName }}</p>
-    <p><strong>Status:</strong> {{ poll?.status }}</p>
-    
-    <div class="chart-container">
-      <div>
-        <h5>Vote Distribution (Pie Chart)</h5>
-        <canvas baseChart
-                [data]="pieChartData"
-                [labels]="pieChartLabels"
-                [chartType]="pieChartType">
-        </canvas>
-      </div>
-      <div>
-        <h5>Vote Distribution (Bar Chart)</h5>
-        <canvas baseChart
-                [datasets]="barChartData"
-                [labels]="barChartLabels"
-                [chartType]="barChartType">
-        </canvas>
-      </div>
+  <div class="chart-container">
+    <div class="chart">
+      <h3>Poll Results (Pie Chart)</h3>
+      <ngx-charts-pie-chart 
+        [results]="pieChartData"
+        [scheme]="pieChartColorScheme"
+        [legend]="true"
+        [animations]="true">
+      </ngx-charts-pie-chart>
     </div>
-    
-    <div class="voters-list">
-      <h4>Voters</h4>
-      <ul>
-        <li *ngFor="let voter of voters">{{ voter.name }} ({{ voter.email }})</li>
-      </ul>
-    </div>
-    
-    <div class="btn-container">
-      <button class="btn btn-edit" (click)="editPoll()">Edit Poll</button>
-      <button class="btn btn-delete" (click)="deletePoll()">Delete Poll</button>
-      <button class="btn btn-toggle" (click)="togglePollStatus()">
-        {{ poll?.status === 'active' ? 'Stop Poll' : 'Resume Poll' }}
-      </button>
+
+    <div class="chart">
+      <h3>Votes Per Option (Bar Chart)</h3>
+      <ngx-charts-bar-vertical
+        [results]="barChartData"
+        [scheme]="barChartColorScheme"
+        [legend]="true"
+        [animations]="true">
+      </ngx-charts-bar-vertical>
     </div>
   </div>
-  
+
+  <h3>Voter Details</h3>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Voted For</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let voter of voters">
+          <td>{{ voter.name }}</td>
+          <td>{{ voter.email }}</td>
+          <td>{{ getVotedOptionText(voter.votedOptionId) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn btn-danger" (click)="deletePoll()">Delete</button>
+    <button class="btn btn-warning" (click)="togglePollStatus()">
+      {{ poll?.status === 'active' ? 'Stop Poll' : 'Activate Poll' }}
+    </button>
+    <button class="btn btn-primary" (click)="editPoll()">Edit</button>
+  </div>
+</div>

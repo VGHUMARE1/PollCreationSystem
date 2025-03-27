@@ -11,6 +11,7 @@
   transition: all 0.3s ease-in-out;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 /* Sidebar Header */
@@ -67,11 +68,37 @@
   transform: translateX(5px);
 }
 
+/* Active Link */
+.nav-link.active {
+  background-color: #00ADB5;
+  color: #222831;
+}
+
+.nav-link.active:hover {
+  background-color: #00ADB5;
+  color: #222831;
+  transform: none;
+}
+
+/* Logout Container */
+.logout-container {
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.logout-btn {
+  margin-top: 15px;
+}
+
 /* Responsive Sidebar (For Small Screens) */
 @media (max-width: 768px) {
   .sidebar {
     width: 60px;
     overflow: hidden;
+  }
+
+  .sidebar-header h4 {
+    display: none;
   }
 
   .nav-link {

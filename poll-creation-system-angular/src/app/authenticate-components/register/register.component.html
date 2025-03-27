@@ -1,38 +1,174 @@
 <div class="register-container">
-  <h2>Register</h2>
-  <form [formGroup]="registerForm" (ngSubmit)="register()">
-
-    <!-- First Name -->
-    <input type="text" placeholder="First Name" formControlName="fname" />
-    <div class="error" *ngIf="isInvalid('fname')">First Name is required (Min 2 chars)</div>
-
-    <!-- Last Name -->
-    <input type="text" placeholder="Last Name" formControlName="lname" />
-    <div class="error" *ngIf="isInvalid('lname')">Last Name is required (Min 2 chars)</div>
-
-    <!-- Email -->
-    <input type="email" placeholder="Email" formControlName="email" (input)="checkEmailExists()" />
-    <div class="error" *ngIf="isInvalid('email')">Valid Email is required</div>
-    <div class="error" *ngIf="emailExists">Email already exists!</div>
-
-    <!-- Password -->
-    <input type="password" placeholder="Password" formControlName="password" />
-    <div class="error" *ngIf="isInvalid('password')">Password must be at least 6 characters</div>
-
-    <!-- Confirm Password -->
-    <input type="password" placeholder="Confirm Password" formControlName="confirmPassword" />
-    <div class="error" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched">
-      Passwords do not match
+  <div class="register-card">
+    <div class="register-header">
+      <h2>Create Your Account</h2>
+      <p>Join our community today!</p>
     </div>
 
-    <!-- Phone Number -->
-    <input type="text" placeholder="Phone Number" formControlName="phoneNumber" />
-    <div class="error" *ngIf="isInvalid('phoneNumber')">Enter a valid 10-digit phone number</div>
+    <form [formGroup]="registerForm" (ngSubmit)="register()" class="register-form">
+      <!-- Two-column layout for names on larger screens -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fname">First Name</label>
+          <input 
+            id="fname" 
+            type="text" 
+            placeholder="Enter your first name" 
+            formControlName="fname"
+            [class.invalid]="isInvalid('fname')"
+            autocomplete="given-name"
+          />
+          <div class="error" *ngIf="isInvalid('fname')">
+            <span *ngIf="registerForm.get('fname')?.errors?.['required']">First name is required</span>
+            <span *ngIf="registerForm.get('fname')?.errors?.['minlength']">Minimum 2 characters</span>
+            <span *ngIf="registerForm.get('fname')?.errors?.['pattern']">Only letters allowed</span>
+          </div>
+        </div>
 
-    <!-- Submit Button -->
-    <button type="submit" [disabled]="registerForm.invalid || emailExists">Register</button>
-  </form>
+        <div class="form-group">
+          <label for="lname">Last Name</label>
+          <input 
+            id="lname" 
+            type="text" 
+            placeholder="Enter your last name" 
+            formControlName="lname"
+            [class.invalid]="isInvalid('lname')"
+            autocomplete="family-name"
+          />
+          <div class="error" *ngIf="isInvalid('lname')">
+            <span *ngIf="registerForm.get('lname')?.errors?.['required']">Last name is required</span>
+            <span *ngIf="registerForm.get('lname')?.errors?.['minlength']">Minimum 2 characters</span>
+            <span *ngIf="registerForm.get('lname')?.errors?.['pattern']">Only letters allowed</span>
+          </div>
+        </div>
+      </div>
 
-  <!-- Display Message -->
-  <p class="message">{{ message }}</p>
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input 
+          id="email" 
+          type="email" 
+          placeholder="Enter your email" 
+          formControlName="email" 
+          (input)="checkEmailExists()"
+          [class.invalid]="isInvalid('email') || emailExists"
+          autocomplete="email"
+        />
+        <div class="error" *ngIf="isInvalid('email')">
+          <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+        </div>
+        <div class="error" *ngIf="emailExists">
+          Email already exists! <a routerLink="/login">Try logging in?</a>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-container">
+          <input 
+            id="password" 
+            type="password" 
+            placeholder="Create a password" 
+            formControlName="password"
+            [class.invalid]="isInvalid('password')"
+            autocomplete="new-password"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility('password')">
+            👁️
+          </button>
+        </div>
+        <div class="error" *ngIf="isInvalid('password')">
+          <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Minimum 8 characters</span>
+          <span *ngIf="registerForm.get('password')?.errors?.['pattern']">
+            Must include uppercase, lowercase, number, and special character
+          </span>
+        </div>
+        <div class="password-strength" *ngIf="registerForm.get('password')?.value">
+          Password strength: 
+          <span [class]="getPasswordStrengthClass()">{{ getPasswordStrength() }}</span>
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="password-container">
+          <input 
+            id="confirmPassword" 
+            type="password" 
+            placeholder="Confirm your password" 
+            formControlName="confirmPassword"
+            [class.invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched"
+            autocomplete="new-password"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility('confirmPassword')">
+            👁️
+          </button>
+        </div>
+        <div class="error" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched">
+          Passwords do not match
+        </div>
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input 
+          id="phoneNumber" 
+          type="tel" 
+          placeholder="Enter your 10-digit phone number" 
+          formControlName="phoneNumber"
+          [class.invalid]="isInvalid('phoneNumber')"
+          autocomplete="tel"
+        />
+        <div class="error" *ngIf="isInvalid('phoneNumber')">
+          <span *ngIf="registerForm.get('phoneNumber')?.errors?.['required']">Phone number is required</span>
+          <span *ngIf="registerForm.get('phoneNumber')?.errors?.['pattern']">Please enter a valid 10-digit number</span>
+        </div>
+      </div>
+
+      <!-- Terms and Conditions -->
+      <div class="form-group terms">
+        <input 
+          type="checkbox" 
+          id="terms" 
+          formControlName="terms"
+          [class.invalid]="registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched"
+        />
+        <label for="terms">
+          I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
+        </label>
+        <div class="error" *ngIf="registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched">
+          You must accept the terms and conditions
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="submit-btn" 
+        [disabled]="registerForm.invalid || emailExists || isSubmitting"
+        [class.loading]="isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Create Account</span>
+        <span *ngIf="isSubmitting">Creating account...</span>
+      </button>
+
+   
+
+      <!-- Login Link -->
+      <div class="login-link">
+        Already have an account? <a href="/login">Sign in</a>
+      </div>
+    </form>
+
+    <!-- Status Message -->
+    <div class="message" [class.success]="isSuccess" [class.error]="!isSuccess && message" *ngIf="message">
+      {{ message }}
+    </div>
+  </div>
 </div>

@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-my-polls',
+  standalone: true,
   imports: [ReactiveFormsModule, CommonModule, FormsModule],
   templateUrl: './my-polls.component.html',
   styleUrls: ['./my-polls.component.css']
@@ -24,12 +25,20 @@ export class MyPollsComponent implements OnInit {
 
   async fetchMyPolls() {
     try {
-      const response = await axios.get(`http://localhost:3000/polls/user/${this.userId}`);
+      const response = await axios.get(`http://localhost:3000/polls/user/${this.userId}`, { withCredentials: true });
       this.myPolls = response.data;
     } catch (error) {
       console.error('Error fetching polls:', error);
+      this.myPolls = []; // Ensure empty array on error
     }
   }
+
+  createNewPoll() {
+    this.router.navigate(['/home/new-poll']);
+  }
+
+  // ... rest of your existing methods ...
+
 
   getVotePercentage(votes: number, totalVotes: number): number {
     return totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;

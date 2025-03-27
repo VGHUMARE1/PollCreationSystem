@@ -1,35 +1,84 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-4">
-      <div class="card custom-card p-4">
-        <h2 class="text-center mb-4">Login</h2>
-        <form [formGroup]="loginForm" (ngSubmit)="login()">
-
-          <!-- Email -->
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" formControlName="email" placeholder="Enter your email" />
-            <div class="error" *ngIf="isInvalid('email')">Valid Email is required</div>
-          </div>
-
-          <!-- Password -->
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" id="password" class="form-control" formControlName="password" placeholder="Enter your password" />
-            <div class="error" *ngIf="isInvalid('password')">Password must be at least 6 characters</div>
-          </div>
-
-          <!-- Login Button -->
-          <button type="submit" class="btn btn-success w-100" [disabled]="loginForm.invalid">Login</button>
-
-          <div class="text-center mt-3">
-            <p>New here? <a href="/register" class="text-primary">Sign up now!</a></p>
-          </div>
-        </form>
-
-        <!-- Success/Error Message -->
-        <p class="message text-center mt-2">{{ message }}</p>
-      </div>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>Welcome Back</h2>
+      <p>Sign in to continue to Poll Creator</p>
     </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          placeholder="Enter your email"
+          [ngClass]="{'is-invalid': (email?.invalid && email?.touched) || message}"
+          autocomplete="email"
+          required
+        >
+        <div *ngIf="email?.touched && email?.invalid" class="invalid-feedback">
+          {{ getEmailErrors() }}
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-input-group">
+          <input 
+            [type]="passwordFieldType" 
+            id="password" 
+            formControlName="password"
+            placeholder="Enter your password"
+            [ngClass]="{'is-invalid': (password?.invalid && password?.touched) || message}"
+            autocomplete="current-password"
+            required
+          >
+          <button 
+            type="button" 
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="passwordFieldType === 'password' ? 'Show password' : 'Hide password'"
+          >
+            <i class="icon" [ngClass]="passwordFieldType === 'password' ? 'icon-eye' : 'icon-eye-off'"></i>
+          </button>
+        </div>
+        <div *ngIf="password?.touched && password?.invalid" class="invalid-feedback">
+          {{ getPasswordErrors() }}
+        </div>
+      </div>
+
+      <!-- Forgot Password Link -->
+      <div class="forgot-password">
+        <a routerLink="/forgot-password">Forgot password?</a>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="submit" 
+        class="login-button" 
+        [disabled]="loginForm.invalid || isLoading"
+      >
+        <span *ngIf="!isLoading">Login</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+      <!-- Error Message -->
+      <div *ngIf="message" class="alert alert-danger">
+        {{ message }}
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+      <!-- Register Link -->
+      <div class="register-link">
+        Don't have an account? <a href="/register">Sign up</a>
+      </div>
+    </form>
   </div>
 </div>

@@ -1,67 +1,123 @@
-<div class="container mt-4">
-    <div class="card custom-card p-4">
-      <h3 class="text-center text-accent mb-3">Edit Poll</h3>
-  
-      <!-- Question Input -->
-      <div class="mb-3">
-        <label for="question" class="form-label">Poll Question</label>
-        <input
-          type="text"
-          id="question"
-          [(ngModel)]="poll.question"
-          class="form-control"
-          placeholder="Enter your question"
-          required
-        />
-      </div>
-  
-      <!-- Options List -->
-      <div *ngFor="let option of poll.options; let i = index" class="input-group mb-2">
-        <input
-          type="text"
-          [(ngModel)]="poll.options[i]"
-          class="form-control"
-          placeholder="Enter option"
-          required
-        />
-        <button
-          class="btn btn-danger"
-          (click)="removeOption(i)"
-          *ngIf="poll.options.length > 2"
-        >
-          ✖
+<div class="edit-poll-container" *ngIf="!loading; else loadingTemplate">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="title">Edit Poll: {{pollData?.question || 'Loading...'}}</h2>
+      <div class="tabs">
+        <button class="tab-btn" [class.active]="activeTab === 'details'" (click)="activeTab = 'details'">
+          <i class="bi bi-card-text"></i> Poll Details
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'expiry'" (click)="activeTab = 'expiry'">
+          <i class="bi bi-clock"></i> Expiry Date
         </button>
       </div>
-  
-      <!-- Add Option Button -->
-      <button class="btn btn-accent mb-3" (click)="addOption()">➕ Add Option</button>
-  
-      <!-- Poll Expiry Date and Time -->
-      <div class="mb-3">
-        <label for="expiryDateTime" class="form-label">Poll Expiry Date & Time</label>
-        <input
-          type="datetime-local"
-          id="expiryDateTime"
-          [(ngModel)]="poll.expiryDate"
-          class="form-control"
-          required
-        />
+    </div>
+    
+    <div class="card-body">
+      <!-- Poll Details Tab -->
+      <div *ngIf="activeTab === 'details'" class="tab-content" [@tabAnimation]>
+        <form [formGroup]="pollForm" (ngSubmit)="updatePollDetails()">
+          <div class="form-group mb-4">
+            <label class="form-label">Poll Question *</label>
+            <input type="text" formControlName="question" class="form-control" 
+                  [ngClass]="{ 'is-invalid': pollForm.get('question')?.invalid && (pollForm.get('question')?.touched || pollForm.get('question')?.dirty) }" />
+            <div *ngIf="pollForm.get('question')?.invalid && (pollForm.get('question')?.touched || pollForm.get('question')?.dirty)" class="invalid-feedback">
+              <i class="bi bi-exclamation-circle"></i> 
+              <span *ngIf="pollForm.get('question')?.errors?.['required']">Question is required</span>
+              <span *ngIf="pollForm.get('question')?.errors?.['maxlength']">Question must be less than 200 characters</span>
+            </div>
+          </div>
+
+          <div class="form-group mb-4">
+            <div class="form-check form-switch">
+              <input type="checkbox" id="multiSelectToggle" class="form-check-input" formControlName="allowMultiple" />
+              <label for="multiSelectToggle" class="form-check-label">Allow Multiple Selections</label>
+            </div>
+            <small class="text-muted">Current votes: {{totalVotes}}</small>
+          </div>
+
+          <div class="form-group mb-4" formArrayName="options">
+            <label class="form-label">Poll Options * (Minimum 2)</label>
+            <div *ngFor="let option of options.controls; let i = index" class="option-group mb-3" @optionAnimation>
+              <div class="input-group">
+                <input type="text" [formControlName]="i" class="form-control" 
+                      [ngClass]="{ 'is-invalid': option.invalid && (option.touched || option.dirty) }" 
+                      placeholder="Option text" />
+                <button type="button" class="btn btn-outline-danger" (click)="removeOption(i)" [disabled]="options.length <= 2">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+              <div *ngIf="option.invalid && (option.touched || option.dirty)" class="invalid-feedback">
+                <i class="bi bi-exclamation-circle"></i> 
+                <span *ngIf="option.errors?.['required']">Option is required</span>
+                <span *ngIf="option.errors?.['maxlength']">Option must be less than 100 characters</span>
+              </div>
+            </div>
+            
+            <button type="button" class="btn btn-outline-primary mt-2" (click)="addOption()" [disabled]="options.length >= 10">
+              <i class="bi bi-plus-circle"></i> Add Option
+            </button>
+            <div *ngIf="options.length >= 10" class="text-muted small mt-2">
+              <i class="bi bi-info-circle"></i> Maximum 10 options allowed
+            </div>
+            <div *ngIf="options.errors?.['minlength'] && (options.touched || options.dirty)" class="invalid-feedback d-block">
+              <i class="bi bi-exclamation-circle"></i> At least 2 options are required
+            </div>
+          </div>
+
+          <div class="form-group d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-secondary" (click)="router.navigate(['/polls'])">
+              <i class="bi bi-arrow-left"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" [disabled]="pollForm.invalid || savingDetails">
+              <span *ngIf="!savingDetails"><i class="bi bi-save"></i> Save Changes</span>
+              <span *ngIf="savingDetails"><i class="bi bi-hourglass-split"></i> Saving...</span>
+            </button>
+          </div>
+        </form>
       </div>
-  
-      <!-- Toggle Switch for Multiple Selections -->
-      <div class="form-check form-switch text-center">
-        <input
-          type="checkbox"
-          id="multiSelectSwitch"
-          [(ngModel)]="poll.allowMultiple"
-          class="form-check-input"
-        />
-        <label for="multiSelectSwitch" class="form-check-label ms-2"
-          >Allow multiple selections</label
-        >
+
+      <!-- Expiry Date Tab -->
+      <div *ngIf="activeTab === 'expiry'" class="tab-content" [@tabAnimation]>
+        <form [formGroup]="expiryForm" (ngSubmit)="updateExpiryDate()">
+          <div class="expiry-info">
+            <h4><i class="bi bi-info-circle"></i> Current Expiry</h4>
+            <p class="current-expiry">
+              <i class="bi bi-calendar-event"></i> {{ originalExpiryDate | date:'fullDate' }}
+              <br>
+              <i class="bi bi-clock"></i> {{ originalExpiryDate | date:'shortTime' }}
+            </p>
+          </div>
+
+          <div class="form-group mb-4">
+            <label class="form-label">New Expiry Date and Time *</label>
+            <input type="datetime-local" formControlName="expiryDateTime" class="form-control" 
+                  [min]="minDateTime"
+                  [ngClass]="{ 'is-invalid': expiryForm.get('expiryDateTime')?.invalid && (expiryForm.get('expiryDateTime')?.touched || expiryForm.get('expiryDateTime')?.dirty) }" />
+            <div *ngIf="expiryForm.get('expiryDateTime')?.invalid && (expiryForm.get('expiryDateTime')?.touched || expiryForm.get('expiryDateTime')?.dirty)" class="invalid-feedback">
+              <i class="bi bi-exclamation-circle"></i> Please select a valid future date and time.
+            </div>
+          </div>
+
+          <div class="form-group d-flex justify-content-between mt-4">
+            <button type="button" class="btn btn-secondary" (click)="activeTab = 'details'">
+              <i class="bi bi-arrow-left"></i> Back to Details
+            </button>
+            <button type="submit" class="btn btn-warning" [disabled]="expiryForm.invalid || !hasExpiryChanged() || savingExpiry">
+              <span *ngIf="!savingExpiry"><i class="bi bi-clock"></i> Update Expiry</span>
+              <span *ngIf="savingExpiry"><i class="bi bi-hourglass-split"></i> Updating...</span>
+            </button>
+          </div>
+        </form>
       </div>
-  
-      <!-- Submit Poll Button -->
-      <button class="btn btn-success w-100 mt-3" (click)="submitPoll()">Save Changes</button>
     </div>
   </div>
+</div>
+
+<ng-template #loadingTemplate>
+  <div class="loading-container">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="loading-text">Loading poll details...</p>
+  </div>
+</ng-template>

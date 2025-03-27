@@ -1,78 +1,218 @@
+import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
 import axios from 'axios';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-edit-poll',
-  imports: [ReactiveFormsModule, CommonModule, FormsModule],
+  standalone: true,
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './edit-poll.component.html',
   styleUrls: ['./edit-poll.component.css'],
 })
 export class EditPollComponent implements OnInit {
-  poll: any = {
-    question: '',
-    options: [],
-    expiryDate: '',
-    allowMultiple: false,
-  };
+  pollForm!: FormGroup;
+  expiryForm!: FormGroup;
+  pollId!: number;
+  loading: boolean = true;
+  savingDetails: boolean = false;
+  savingExpiry: boolean = false;
+  minDateTime!: string;
+  activeTab: 'details' | 'expiry' = 'details';
+  originalExpiryDate!: string;
+  pollData: any;
+  totalVotes: number = 0;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
-
-  ngOnInit(): void {
-    const pollId = this.route.snapshot.paramMap.get('id');
-    this.fetchPoll("1");
+  constructor(
+    private fb: FormBuilder,
+    private route: ActivatedRoute,
+    public router: Router
+  ) {
+    this.initializeForms();
   }
 
-  async fetchPoll(pollId: string) {
+  async ngOnInit() {
+    this.pollId = Number(this.route.snapshot.paramMap.get('id'));
+    this.setMinDateTime();
+    await this.fetchPollData();
+  }
+
+  setMinDateTime() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    this.minDateTime = now.toISOString().slice(0, 16);
+  }
+
+  initializeForms() {
+    this.pollForm = this.fb.group({
+      question: ['', [Validators.required, Validators.maxLength(200)]],
+      allowMultiple: [false],
+      options: this.fb.array([], Validators.minLength(2)),
+    });
+
+    this.expiryForm = this.fb.group({
+      expiryDateTime: ['', Validators.required],
+    });
+  }
+
+  async fetchPollData() {
     try {
-      const response = await axios.get(`http://localhost:3000/polls/${pollId}`);
-      this.poll = {
-        ...response.data,
-        options: JSON.parse(response.data.options), // Parse options if stored as JSON string
-        expiryDate: this.formatDateTime(response.data.expiryDate), // Format expiry date for input
-      };
+      const response = await axios.get(
+        `http://localhost:3000/polls/${this.pollId}`,
+        { withCredentials: true }
+      );
+      this.pollData = response.data;
+      this.totalVotes = this.pollData.voters?.length || 0;
+      this.populateAllFormFields();
     } catch (error) {
       console.error('Error fetching poll:', error);
+      this.showToast('Failed to load poll data. Please try again.', 'error');
+      this.router.navigate(['/polls']);
+    } finally {
+      this.loading = false;
     }
   }
 
-  // Format date to 'YYYY-MM-DDTHH:MM' for datetime-local input
-  formatDateTime(dateString: string): string {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  populateAllFormFields() {
+    this.pollForm.patchValue({
+      question: this.pollData.question,
+      allowMultiple: this.pollData.allowMultiple,
+    });
+
+    const optionsArray = this.pollForm.get('options') as FormArray;
+    optionsArray.clear();
+    this.pollData.options.forEach((option: any) => {
+      optionsArray.push(
+        this.fb.control(option.optionText, [
+          Validators.required,
+          Validators.maxLength(100),
+        ])
+      );
+    });
+
+    const formattedDate = this.formatDateTimeLocal(
+      this.pollData.expiryDateTime
+    );
+    this.expiryForm.patchValue({
+      expiryDateTime: formattedDate,
+    });
+    this.originalExpiryDate = this.pollData.expiryDateTime;
+  }
+
+  formatDateTimeLocal(dateTime: string): string {
+    const date = new Date(dateTime);
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString().slice(0, 16);
+  }
+
+  get options() {
+    return this.pollForm.get('options') as FormArray;
   }
 
   addOption() {
-    this.poll.options.push('');
+    if (this.options.length < 10) {
+      this.options.push(
+        this.fb.control('', [Validators.required, Validators.maxLength(100)])
+      );
+    }
   }
 
   removeOption(index: number) {
-    this.poll.options.splice(index, 1);
+    if (this.options.length > 2) {
+      this.options.removeAt(index);
+    }
   }
 
-  async submitPoll() {
-    try {
-      const pollId = this.route.snapshot.paramMap.get('id');
-      const payload = {
-        question: this.poll.question,
-        options: JSON.stringify(this.poll.options), // Stringify options if needed
-        expiryDate: new Date(this.poll.expiryDate).toISOString(), // Convert to ISO string
-        allowMultiple: this.poll.allowMultiple,
-      };
+  async updatePollDetails() {
+    if (this.pollForm.invalid) return;
 
-      await axios.put(`http://localhost:3000/polls/${pollId}`, payload);
-      alert('Poll updated successfully!');
-      this.router.navigate(['/my-polls']); // Redirect to My Polls page
+    this.savingDetails = true;
+    try {
+      const { question, allowMultiple } = this.pollForm.value;
+      const options = this.pollForm.value.options.map((optionText: string) => ({
+        optionText,
+      }));
+      const data = {
+        pollId: this.pollId,
+        question,
+        allowMultipleSelect: allowMultiple,
+        options,
+      };
+      console.log(data);
+     const response= await axios.put(`http://localhost:3000/polls/update`, data, {
+        withCredentials: true,
+      });
+      console.log(response);
+      alert(response.data);
+
+      this.showToast('Poll details updated successfully!', 'success');
     } catch (error) {
-      console.error('Error updating poll:', error);
-      alert('Failed to update poll.');
+      console.error('Error updating poll details:', error);
+      this.showToast(
+        'Failed to update poll details. Please try again.',
+        'error'
+      );
+    } finally {
+      this.savingDetails = false;
     }
+  }
+
+  async updateExpiryDate() {
+    if (this.expiryForm.invalid) return;
+
+    this.savingExpiry = true;
+    try {
+      const date = new Date(this.expiryForm.value.expiryDateTime);
+      // Format the date manually to avoid the 'Z' at the end
+      const expiryDateTime =
+        date.getFullYear() +
+        '-' +
+        String(date.getMonth() + 1).padStart(2, '0') +
+        '-' +
+        String(date.getDate()).padStart(2, '0') +
+        'T' +
+        String(date.getHours()).padStart(2, '0') +
+        ':' +
+        String(date.getMinutes()).padStart(2, '0') +
+        ':00';
+
+      await axios.put(
+        `http://localhost:3000/polls/expiry/${this.pollId}`,
+        { expiryDateTime },
+        { withCredentials: true }
+      );
+
+      this.originalExpiryDate = expiryDateTime;
+      this.showToast('Expiry date updated successfully!', 'success');
+    } catch (error) {
+      console.error('Error updating expiry date:', error);
+      this.showToast(
+        'Failed to update expiry date. Please try again.',
+        'error'
+      );
+    } finally {
+      this.savingExpiry = false;
+    }
+  }
+
+  hasExpiryChanged(): boolean {
+    if (!this.originalExpiryDate) return false;
+    const newDate = new Date(this.expiryForm.value.expiryDateTime);
+    const originalDate = new Date(this.originalExpiryDate);
+    return newDate.getTime() !== originalDate.getTime();
+  }
+
+  showToast(message: string, type: 'success' | 'error') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <i class="bi ${
+        type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle'
+      }"></i>
+      <span>${message}</span>
+    `;
+    document.body.appendChild(toast);
   }
 }

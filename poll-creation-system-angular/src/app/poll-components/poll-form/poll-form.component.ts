@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
@@ -12,37 +12,45 @@ import axios from 'axios';
   templateUrl: './poll-form.component.html',
   styleUrls: ['./poll-form.component.css']
 })
-export class PollFormComponent {
+export class PollFormComponent implements OnInit {
   pollQuestion: string = '';
   allowMultiple: boolean = false;
   pollOptions: { value: string }[] = [{ value: '' }, { value: '' }]; // Minimum 2 options
   expiryDateTime: string = ''; // Store expiry date and time
-constructor(
+  minDateTime!: string; // Store minimum datetime for expiry field
+
+  constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
-  ) { 
+  ) {}
+
+  ngOnInit() {
+    this.setMinDateTime(); // Set minimum selectable datetime
   }
 
+  setMinDateTime() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Adjust for timezone
+    this.minDateTime = now.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+  }
 
   addOption() {
-    this.pollOptions = [...this.pollOptions, { value: '' }]; // Adds a new option while keeping the array immutable
+    this.pollOptions = [...this.pollOptions, { value: '' }];
   }
 
   removeOption(index: number) {
     if (this.pollOptions.length > 2) {
-      this.pollOptions = this.pollOptions.filter((_, i) => i !== index); // Creates a new array to prevent focus loss
+      this.pollOptions = this.pollOptions.filter((_, i) => i !== index);
     }
   }
 
- async submitPoll() {
-    // Trim the question and options
+  async submitPoll() {
     this.pollQuestion = this.pollQuestion.trim();
     const validOptions = this.pollOptions
       .map(option => option.value.trim())
-      .filter(option => option.length > 0); // Removing empty options
+      .filter(option => option.length > 0);
 
-    // Validations
     if (!this.pollQuestion) {
       alert('Poll question is required.');
       return;
@@ -54,25 +62,37 @@ constructor(
     }
 
     if (!this.expiryDateTime) {
-      alert('Please select an expiry date and time for the poll.');
+      alert('Please select an expiry date and time.');
       return;
     }
-    // console.log()
-     if(!this.authService.isLoggedIn()){
-      alert("You must logged in ");
-      this.router.navigate([`/login`]);
-     }
-    // Creating JSON object
+
+    if (new Date(this.expiryDateTime) < new Date()) {
+      alert('Expiry date cannot be in the past!');
+      return;
+    }
+
+    if (!this.authService.isLoggedIn()) {
+      alert('You must be logged in.');
+      this.router.navigate(['/login']);
+      return;
+    }
+
     const pollData = {
       question: this.pollQuestion,
       options: validOptions,
       allowMultiple: this.allowMultiple,
-      expiryDateTime: new Date(this.expiryDateTime).toISOString(), // Convert to ISO format
-      createdAt: new Date().toISOString(), // Adding timestamp
+      expiryDateTime: new Date(this.expiryDateTime).toISOString(),
+      createdAt: new Date().toISOString(),
     };
 
-    let response= await axios.post("http://localhost:3000/polls",pollData, { withCredentials: true });
-    alert("Poll successfully created");
-    console.log(pollData);
+    try {
+      await axios.post('http://localhost:3000/polls', pollData, { withCredentials: true });
+      alert('Poll successfully created');
+      this.router.navigate(['/polls']);
+    } catch (error : any) {
+      console.error('Error creating poll:', error);
+      alert(error.response?.data?.message || 'Failed to create poll. Please try again.');
+    }
   }
+
 }

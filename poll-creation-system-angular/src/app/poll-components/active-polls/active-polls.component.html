@@ -1,42 +1,134 @@
-<div class="container">
-  <h2 class="text-accent text-center">Active Polls</h2>
+<div class="polls-app">
+  <div class="glass-container">
+    <header class="app-header">
+      <div class="logo">
+        <i class="fas fa-vote-yea"></i>
+        <h1>Pollify</h1>
+      </div>
+      <div class="page-indicator" *ngIf="allPolls.length > 0">
+        <span class="current">{{ currentPage }}</span>
+        <span class="total">/{{ totalPages }}</span>
+      </div>
+    </header>
 
-  <div class="polls-grid">
-    <div *ngFor="let poll of activePolls" class="poll-card">
-      <h5 class="poll-title">{{ poll.question }}</h5>
+    <!-- Add this no-polls message container -->
+    <div class="no-polls-message" *ngIf="allPolls.length === 0">
+      <i class="fas fa-info-circle"></i>
+      <h3>No active polls available</h3>
+      <p>
+        There are currently no active polls to display. Check back later or
+        create a new poll!
+      </p>
+    </div>
 
-      <!-- Poll Options -->
-      <div *ngFor="let option of poll.options; let i = index" class="form-check poll-option">
-        <!-- Checkbox for multiple-choice polls -->
-        <input
-          *ngIf="poll.allowMultiple"
-          type="checkbox"
-          [name]="'poll' + poll._id"
-          [value]="option"
-          [(ngModel)]="poll.selectedOptions[i]"
-          class="form-check-input" />
+    <div class="poll-grid">
+      <ng-container *ngFor="let poll of displayedPolls">
+        <div class="poll-card">
+          <div class="card-header">
+            <div
+              class="poll-type"
+              [ngClass]="{
+                multi: poll.allowMultiple,
+                single: !poll.allowMultiple
+              }"
+            >
+              {{ poll.allowMultiple ? "MULTIPLE" : "SINGLE" }}
+            </div>
+            <h2 class="question">{{ poll.question }}</h2>
+            <div class="poll-meta">
+              <span><i class="fas fa-user-edit"></i> {{ poll.createdBy }}</span>
+              <span
+                ><i class="fas fa-hourglass-half"></i>
+                {{ poll.expiryDate }}</span
+              >
+            </div>
+          </div>
 
-        <!-- Radio button for single-choice polls -->
-        <input
-          *ngIf="!poll.allowMultiple"
-          type="radio"
-          [name]="'poll' + poll._id"
-          [value]="option"
-          [(ngModel)]="poll.selectedOption"
-          class="form-check-input" />
+          <!-- Multiple Choice Options -->
+          <ng-container *ngIf="poll.allowMultiple">
+            <div
+              *ngFor="
+                let option of poll.options;
+                let i = index;
+                trackBy: trackByOption
+              "
+              class="option"
+            >
+              <label>
+                <input
+                  type="checkbox"
+                  [name]="'poll_' + poll._id"
+                  [(ngModel)]="poll.selectedOptions![i]"
+                />
+                <span class="custom-control"></span>
+                <span class="option-text">{{ option.optionText }}</span>
+              </label>
+            </div>
+          </ng-container>
 
-        <label class="form-check-label">{{ option }}</label>
+          <!-- Single Choice Options -->
+          <ng-container *ngIf="!poll.allowMultiple">
+            <div
+              *ngFor="let option of poll.options; trackBy: trackByOption"
+              class="option"
+            >
+              <label>
+                <input
+                  type="radio"
+                  [name]="'poll_' + poll._id"
+                  [(ngModel)]="poll.selectedOption"
+                  [value]="option.id"
+                />
+                <span class="custom-control"></span>
+                <span class="option-text">{{ option.optionText }}</span>
+              </label>
+            </div>
+          </ng-container>
+
+          <div class="card-footer">
+            <div class="votes">
+              <i class="fas fa-chart-pie"></i>
+              <span>{{ poll.totalVotes }} votes</span>
+            </div>
+            <button class="submit-btn" (click)="vote(poll)">
+              <i class="fas fa-paper-plane"></i>
+              <span>Cast Vote</span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <div class="pagination">
+      <button
+        class="nav-btn prev"
+        (click)="prevPage()"
+        [disabled]="currentPage === 1"
+      >
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <div class="page-numbers">
+        <ng-container *ngFor="let page of getPageRange()">
+          <button
+            *ngIf="page !== -1"
+            class="page-btn"
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+          <span *ngIf="page === -1" class="ellipsis">...</span>
+        </ng-container>
       </div>
 
-      <!-- Submit Vote Button -->
-      <button class="btn btn-success vote-btn" (click)="vote(poll)">Vote</button>
-
-      <!-- Poll Details -->
-      <div class="poll-details">
-        <p>👤 <span>{{ poll.createdBy }}</span></p>
-        <p>⏳ <span>{{ poll.expiryDate }}</span></p>
-        <p>📊 <span>{{ poll.totalVotes }} votes</span></p>
-      </div>
+      <button
+        class="nav-btn next"
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+      >
+        <i class="fas fa-chevron-right"></i>
+      </button>
     </div>
   </div>
 </div>

@@ -1,0 +1,107 @@
+<div class="polls-app">
+  <div class="glass-container">
+    <!-- ... (keep existing header code) ... -->
+
+    <div *ngIf="votedPolls.length > 0; else noPolls" class="poll-grid">
+      <div *ngFor="let poll of displayedPolls; trackBy: trackByPollId" class="poll-card voted">
+        <div class="card-header">
+          <div class="poll-status">
+            <i class="fas fa-check-circle"></i> Voted
+          </div>
+          <h2 class="question">{{poll.question}}</h2>
+          <div class="poll-meta">
+            <span><i class="fas fa-user-edit"></i> {{poll.createdBy}}</span>
+            <span><i class="fas fa-hourglass-end"></i> Ended {{poll.expiryDate}}</span>
+          </div>
+        </div>
+
+        <!-- Display mode (when not editing) -->
+        <div class="options" *ngIf="editingPollId !== poll._id">
+          <div *ngFor="let option of poll.options" class="option">
+            <div class="option-result" [class.user-voted]="isUserVoted(option, poll.userVotes)">
+              <span class="option-text">{{option.optionText}}</span>
+              <span *ngIf="isUserVoted(option, poll.userVotes)" class="user-selection">
+                <i class="fas fa-check"></i> Your choice
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit mode (when editing) -->
+        <div class="options" *ngIf="editingPollId === poll._id">
+          <div *ngFor="let option of poll.options; let i = index" class="option">
+            <label>
+              <input 
+                [type]="poll.allowMultiple ? 'checkbox' : 'radio'"
+                [name]="'poll_' + poll._id"
+                [(ngModel)]="poll.selectedOptions![i]"
+                [checked]="poll.selectedOptions![i]">
+              <span class="custom-control"></span>
+              <span class="option-text">{{option.optionText}}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="votes">
+            <i class="fas fa-chart-pie"></i>
+            <span>{{poll.totalVotes}} total votes</span>
+          </div>
+          
+          <div class="action-buttons">
+            <!-- Delete Vote Button -->
+            <button class="btn-delete" (click)="deleteVote(poll._id)">
+              <i class="fas fa-trash-alt"></i> Delete Vote
+            </button>
+            
+            <!-- Edit/Change Vote Button -->
+            <button *ngIf="editingPollId !== poll._id" class="btn-edit" (click)="toggleEditMode(poll._id)">
+              <i class="fas fa-edit"></i> Change Vote
+            </button>
+            
+            <!-- Save Changes Button -->
+            <button *ngIf="editingPollId === poll._id" class="btn-save" (click)="changeVote(poll)">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
+            
+            <!-- Cancel Button -->
+            <button *ngIf="editingPollId === poll._id" class="btn-cancel" (click)="toggleEditMode(poll._id)">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <ng-template #noPolls>
+      <div class="no-polls-message">
+        <i class="fas fa-inbox"></i>
+        <h3>You haven't voted on any polls yet</h3>
+        <p>Participate in active polls to see them here</p>
+      </div>
+    </ng-template>
+
+    <div *ngIf="votedPolls.length > 0" class="pagination">
+      <button class="nav-btn prev" (click)="prevPage()" [disabled]="currentPage === 1">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      
+      <div class="page-numbers">
+        <ng-container *ngFor="let page of getPageRange()">
+          <button 
+            *ngIf="page !== -1"
+            class="page-btn" 
+            [class.active]="page === currentPage"
+            (click)="goToPage(page)">
+            {{page}}
+          </button>
+          <span *ngIf="page === -1" class="ellipsis">...</span>
+        </ng-container>
+      </div>
+      
+      <button class="nav-btn next" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,10 @@
 <div class="container mt-4">
-  <h2 class="text-center title">My Polls</h2>
+ 
+    <div class="logo">
+      <h1>
+    <i class="fas fa-user-circle"></i> Your Polls</h1>
+  </div>
+
 
   <div class="row justify-content-center">
     <div *ngFor="let poll of getPaginatedPolls()" class="col-md-8">
@@ -38,10 +43,33 @@
     </div>
   </div>
 
-  <!-- Pagination Controls -->
-  <div class="pagination-controls text-center mt-3">
-    <button class="btn btn-nav" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
-    <span class="page-indicator">Page {{ currentPage }}</span>
-    <button class="btn btn-nav" (click)="nextPage()" [disabled]="currentPage * pollsPerPage >= myPolls.length">Next</button>
+  
+    <div *ngIf="myPolls.length > 0; else noPolls">
+      <!-- Existing poll cards content -->
+      <div class="row justify-content-center">
+        <div *ngFor="let poll of getPaginatedPolls()" class="col-md-8">
+          <!-- Your existing poll card content -->
+        </div>
+      </div>
+  
+      <!-- Pagination Controls -->
+      <div class="pagination-controls text-center mt-3">
+        <button class="btn btn-nav" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
+        <span class="page-indicator">Page {{ currentPage }}</span>
+        <button class="btn btn-nav" (click)="nextPage()" [disabled]="currentPage * pollsPerPage >= myPolls.length">Next</button>
+      </div>
+    </div>
+  
+    <ng-template #noPolls>
+      <div class="no-polls-container">
+        <div class="no-polls-content">
+          <i class="fas fa-poll-h fa-4x no-polls-icon"></i>
+          <h3 class="no-polls-title">No Polls Created Yet</h3>
+          <p class="no-polls-message">You haven't created any polls. Start by creating your first poll!</p>
+          <button class="btn btn-create" (click)="createNewPoll()">
+            <i class="fas fa-plus-circle"></i> Create Your First Poll
+          </button>
+        </div>
+      </div>
+    </ng-template>
   </div>
-</div>

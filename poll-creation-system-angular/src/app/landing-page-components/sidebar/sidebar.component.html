@@ -6,29 +6,35 @@
 
   <ul class="nav flex-column">
     <li class="nav-item">
-      <a href="/home/new-poll" class="nav-link">
+      <a href="/home/new-poll" class="nav-link" [class.active]="isActive('/home/new-poll')">
         <i class="bi bi-house-door-fill"></i> <span>Home</span>
       </a>
     </li>
     <li class="nav-item">
-      <a href="/home/my-polls" class="nav-link">
-        <i class="bi bi-bar-chart-fill"></i> <span>My Polls</span>
+      <a href="/home/my-polls" class="nav-link" [class.active]="isActive('/home/my-polls')">
+        <i class="bi bi-bar-chart-fill"></i> <span>Your Polls</span>
       </a>
     </li>
     <li class="nav-item">
-      <a href="/home/active-polls" class="nav-link">
+      <a href="/home/active-polls" class="nav-link" [class.active]="isActive('/home/active-polls')">
         <i class="bi bi-clipboard-check-fill"></i> <span>Active Polls</span>
       </a>
     </li>
     <li class="nav-item">
-      <a href="/home/profile" class="nav-link">
+      <a href="/home/voted-polls" class="nav-link" [class.active]="isActive('/home/voted-polls')">
+        <i class="bi bi-check-circle-fill"></i> <span>Voted Polls</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a href="/home/profile" class="nav-link" [class.active]="isActive('/home/profile')">
         <i class="bi bi-person-circle"></i> <span>Profile</span>
       </a>
     </li>
-    <li class="nav-item ">
-      <a class="nav-link"  (click)="logout()">
-        <i class="bi bi-box-arrow-right"></i> <span >Logout</span>
-      </a>
-    </li>
   </ul>
+
+  <div class="logout-container">
+    <a class="nav-link logout-btn" (click)="logout()">
+      <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+    </a>
+  </div>
 </div>

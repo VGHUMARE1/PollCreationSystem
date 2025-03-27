@@ -1,12 +1,13 @@
+import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { ScaleType } from '@swimlane/ngx-charts';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import axios from 'axios';
-import { ChartOptions, ChartType, ChartData } from 'chart.js';
-
-import { SingleDataSet } from 'ng2-charts';
+import { Color } from '@swimlane/ngx-charts';
 
 @Component({
   selector: 'app-poll-analysis',
+  imports: [NgxChartsModule],
   templateUrl: './poll-analysis.component.html',
   styleUrls: ['./poll-analysis.component.css']
 })
@@ -14,25 +15,31 @@ export class PollAnalysisComponent implements OnInit {
   poll: any = null;
   pollId: number = 0;
   voters: any[] = [];
+  pollCreator: any = {};
 
   // Pie Chart Configuration
-  pieChartOptions: ChartOptions = {
-    responsive: true,
+  pieChartData: any[] = [];
+  pieChartColorScheme: Color = {
+    domain: [],
+    name: '',
+    selectable: false,
+    group: ScaleType.Time
   };
-  pieChartLabels: string[] = [];
-  pieChartData: SingleDataSet = [];
-  pieChartType: ChartType = 'pie';
 
   // Bar Chart Configuration
-  barChartOptions: ChartOptions = {
-    responsive: true,
+  barChartData: any[] = [];
+  barChartColorScheme: Color = {
+    domain: [],
+    name: '',
+    selectable: false,
+    group: ScaleType.Time
   };
-  barChartLabels: string[] = [];
-  barChartData: ChartData<'bar'> = {
-    labels: [],
-    datasets: [{ data: [], label: 'Votes', backgroundColor: '#00ADB5' }]
-  };
-  barChartType: ChartType = 'bar';
+
+  // Predefined color palette
+  private colorPalette: string[] = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    '#FF9F40', '#E7E9ED', '#8C564B', '#17BECF', '#BCBD22'
+  ];
 
   constructor(private route: ActivatedRoute, private router: Router) {}
 
@@ -48,17 +55,28 @@ export class PollAnalysisComponent implements OnInit {
 
   async fetchPollDetails() {
     try {
-      const response = await axios.get(`http://localhost:3000/polls/${this.pollId}`);
+      const response = await axios.get(`http://localhost:3000/polls/${this.pollId}`,{ withCredentials: true });
       this.poll = response.data;
       this.voters = this.poll?.voters || [];
+      this.pollCreator = this.poll?.creator || {};
 
       if (this.poll?.options) {
-        this.pieChartLabels = this.poll.options.map((opt: any) => opt.optionText);
-        this.pieChartData = this.poll.options.map((opt: any) => opt.votes);
+        // Prepare Pie Chart Data
+        this.pieChartData = this.poll.options.map((opt: any, index: number) => ({
+          name: opt.optionText,
+          value: opt.votes
+        }));
 
-        this.barChartLabels = this.pieChartLabels;
-        this.barChartData.labels = this.pieChartLabels;
-        this.barChartData.datasets[0].data = this.poll.options.map((opt: any) => opt.votes);
+        // Prepare Bar Chart Data
+        this.barChartData = this.poll.options.map((opt: any, index: number) => ({
+          name: opt.optionText,
+          value: opt.votes
+        }));
+
+        // Dynamically generate color scheme
+        const colors = this.generateColorScheme(this.poll.options.length);
+        this.pieChartColorScheme.domain = colors;
+        this.barChartColorScheme.domain = colors;
       }
     } catch (error) {
       console.error('Error fetching poll details:', error);
@@ -66,11 +84,31 @@ export class PollAnalysisComponent implements OnInit {
     }
   }
 
+  // Generate a color scheme dynamically
+  private generateColorScheme(numColors: number): string[] {
+    const colors: string[] = [];
+    for (let i = 0; i < numColors; i++) {
+      // Use predefined palette or generate random colors
+      colors.push(this.colorPalette[i % this.colorPalette.length] || this.getRandomColor());
+    }
+    return colors;
+  }
+
+  // Generate a random color
+  private getRandomColor(): string {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+
   async deletePoll() {
     if (!confirm('Are you sure you want to delete this poll?')) return;
 
     try {
-      await axios.delete(`http://localhost:3000/polls/${this.pollId}`);
+      await axios.delete(`http://localhost:3000/polls/${this.pollId}`,{ withCredentials: true });
       alert('Poll deleted successfully!');
       this.router.navigate(['/home/my-polls']);
     } catch (error) {
@@ -86,7 +124,7 @@ export class PollAnalysisComponent implements OnInit {
     if (!confirm(`Are you sure you want to ${newStatus} this poll?`)) return;
 
     try {
-      await axios.put(`http://localhost:3000/polls/${this.pollId}`, { status: newStatus });
+      await axios.put(`http://localhost:3000/polls/${this.pollId}/status`, { status: newStatus },{ withCredentials: true });
       this.poll.status = newStatus;
     } catch (error) {
       console.error('Error updating poll status:', error);
@@ -96,5 +134,10 @@ export class PollAnalysisComponent implements OnInit {
 
   editPoll() {
     this.router.navigate([`/home/edit-poll/${this.pollId}`]);
+  }
+
+  getVotedOptionText(votedOptionId: number): string {
+    const option = this.poll?.options.find((opt: { id: number; }) => opt.id === votedOptionId);
+    return option ? option.optionText : 'N/A';
   }
 }

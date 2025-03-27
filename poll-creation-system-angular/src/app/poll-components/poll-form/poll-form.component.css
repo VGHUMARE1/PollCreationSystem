@@ -1,37 +1,247 @@
-/* Page Background */
-/* Center the form and reduce its width */
+/* Poll Form Component - Enhanced Glassmorphism Style */
+:host {
+  /* Updated Color Palette */
+  --primary: #6C5CE7;       /* Rich purple */
+  --primary-light: #A29BFE; /* Soft lavender */
+  --primary-dark: #5649D6;  /* Deep purple */
+  --secondary: #00B894;     /* Vibrant teal */
+  --accent: #FD79A8;       /* Soft pink */
+  --danger: #E84393;       /* Pinkish red */
+  --dark: #2D3436;         /* Charcoal */
+  --light: #F5F6FA;        /* Light gray */
+  --text-dark: #2D3436;    /* Dark text */
+  --text-light: #F5F6FA;   /* Light text */
+  
+  /* Glassmorphism Effects */
+  --glass: rgba(255, 255, 255, 0.15);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  
+  /* Dimensions */
+  --border-radius: 14px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 5rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-card {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 600px;
+  transition: var(--transition);
+}
+
+.custom-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(108, 92, 231, 0.3);
+}
+
+.text-accent {
+  color: var(--primary-light);
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.5px;
+}
+
+/* Form Elements */
+.form-label {
+  color: var(--text-light);
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  display: block;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.form-control {
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-light);
+  border-radius: var(--border-radius);
+  padding: 0.9rem 1.2rem;
+  transition: var(--transition);
+  width: 100%;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.form-control:focus {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+  color: var(--text-light);
+  outline: none;
+}
+
+/* Input Group for Options */
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn {
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 0.9rem 1.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.btn-accent {
+  background: rgba(253, 121, 168, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(253, 121, 168, 0.3);
+}
+
+.btn-accent:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(253, 121, 168, 0.3);
+}
+
+.btn-danger {
+  background: rgba(232, 67, 147, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(232, 67, 147, 0.3);
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(232, 67, 147, 0.3);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--secondary), #00A884);
+  color: white;
+  box-shadow: 0 4px 16px rgba(0, 184, 148, 0.4);
+  padding: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  margin-top: 1rem;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 184, 148, 0.5);
+  background: linear-gradient(135deg, #00A884, var(--secondary));
+}
+
+/* Toggle Switch */
+.form-switch {
+  padding-left: 3.8rem;
+  margin: 2rem 0;
+}
+
+.form-check-input {
+  width: 3.2rem;
+  height: 1.6rem;
+  background-color: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23ffffff80'/%3e%3c/svg%3e");
+}
+
+.form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+.form-check-label {
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem;
   }
   
   .custom-card {
-    width: 50%; /* Adjust width (reduce for smaller size) */
-    max-width: 500px; /* Prevent it from getting too wide */
-    background-color: #393E46;
-    color: #EEEEEE;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
   }
   
-  /* Form Inputs */
+  .text-accent {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+  }
+  
   .form-control {
-    background-color: #EEEEEE;
-    color: #222831;
-    border: 1px solid #00ADB5;
-    border-radius: 5px;
+    padding: 0.8rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 1.25rem;
   }
   
-  /* Buttons */
-  .btn-accent {
-    background-color: #00ADB5;
-    color: #EEEEEE;
-    border: none;
+  .custom-card {
+    padding: 1.5rem;
   }
   
-  .btn-accent:hover, .btn-success:hover {
-    background-color: #008C9E;
+  .text-accent {
+    font-size: 1.4rem;
   }
   
+  .input-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .btn-danger {
+    width: 100%;
+    height: auto;
+    padding: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+}
