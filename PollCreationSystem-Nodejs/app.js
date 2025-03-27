@@ -1,4 +1,5 @@
 const dotenv = require("dotenv");
+dotenv.config();
 const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
@@ -8,20 +9,20 @@ const pollsRoutes = require("./routes/pollsRoute.js");
 const cors = require("cors");
 const configurePassport = require("./config/passport.js");
 
-// Load environment variables
-dotenv.config();
 
 // Initialize Express
 const app = express();
 
 // CORS Middleware
-app.use(cors({
-  origin: "http://localhost:4200",
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
+app.use(
+  cors({
+    origin: "http://localhost:4200", // Allow frontend access
+    credentials: true, // Allow cookies and authentication headers
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Added OPTIONS for preflight requests
+    allowedHeaders: ["Content-Type", "Authorization"], // Headers that can be sent in requests
+    exposedHeaders: ["Authorization"], // Allows the frontend to access specific headers
+  })
+);
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -64,7 +65,7 @@ app.use(passport.session());
 
 // Routes
 app.use("/auth", authRoutes);
-app.use("/", pollsRoutes);
+app.use("/polls", pollsRoutes);
 app.get("/profile", (req, res) => {
   const user={
        fname:req.user.fname,

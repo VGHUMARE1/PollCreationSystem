@@ -32,7 +32,7 @@ const User = sequelize.define("User", {
     allowNull: false,
   },
 }, {
-  tableName: "Users" // Ensures correct table name
+  tableName: "User" // Ensures correct table name
 });
 
 module.exports = User;
