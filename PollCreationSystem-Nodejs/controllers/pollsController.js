@@ -95,12 +95,12 @@ module.exports.giveVote=async (req, res) => {
       req.body
     );
 
-    console.log(result.data.message);
+    console.log(result);
 
     // Send success response with status 200
     res.status(200).json(result.data.message);
   } catch (error) {
-    console.error(error.message);
+    console.error(error);
 
     // Send proper error response with status 500
     res.status(500).json({ msg: error.message || "Internal Server Error" });
@@ -290,7 +290,7 @@ module.exports.changeStatusOfPoll=async (req, res) => {
 module.exports.deletePoll=  async (req, res) => {
   try {
     const pollId = req.params.pollId;
-    const result = await axios.delete(`${process.env.APIURL}/polls/${pollId}`);
+    const result = await axios.delete(`${process.env.APIURL}/polls/delete?id=${pollId}`);
 
     if (result) {
       res.json({ message: "Poll deleted successfully" });

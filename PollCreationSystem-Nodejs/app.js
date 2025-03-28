@@ -68,11 +68,11 @@ app.use("/auth", authRoutes);
 app.use("/polls", pollsRoutes);
 app.get("/profile", (req, res) => {
   const user={
-       fname:req.user.fname,
-       lname:req.user.lname,
+    first_name:req.user.first_name,
+    last_name:req.user.last_name,
        email:req.user.email,
-       phoneNumber:req.user.phoneNumber
-  }
+       phone_no:req.user.phone_no
+  } 
   res.json({ message: "API is running", user  });
 });
 

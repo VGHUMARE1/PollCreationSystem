@@ -2,37 +2,33 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database"); // Ensure correct import
 
 const User = sequelize.define("User", {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true,
-  },
-  fname: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  lname: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true, // Ensures email is unique
+    primaryKey: true, // Set email as primary key
     validate: {
-      isEmail: true, // Validates proper email format
+      isEmail: true, // Ensures valid email format
     },
   },
-  phoneNumber: {
+  first_name: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true, // Matches DEFAULT NULL constraint
+  },
+  last_name: {
+    type: DataTypes.STRING,
+    allowNull: true, // Matches DEFAULT NULL constraint
   },
   password: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true, // Matches DEFAULT NULL constraint
+  },
+  phone_no: {
+    type: DataTypes.STRING,
+    allowNull: true, // Matches DEFAULT NULL constraint
   },
 }, {
-  tableName: "User" // Ensures correct table name
+  tableName: "user", // Matches table name in MySQL
+  timestamps: false, // No timestamps as per given schema
 });
 
 module.exports = User;
