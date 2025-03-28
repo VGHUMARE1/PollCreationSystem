@@ -7,21 +7,21 @@ import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-profile',
-  imports:[ReactiveFormsModule,CommonModule,FormsModule],
+  imports: [ReactiveFormsModule, CommonModule, FormsModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
   user = {
-    fname: '',
-    lname: '',
+    first_name: '',
+    last_name: '',
     email: '',
-    phoneNumber: ''
+    phone_no: ''
   };
 
   isEditing = false;
- constructor(private cookieService: CookieService) {
-  
+
+  constructor(private cookieService: CookieService) {
     console.log(this.cookieService.check(""));
   }
 
@@ -47,12 +47,11 @@ export class ProfileComponent implements OnInit {
 
   // Update User Profile
   async updateProfile() {
-    if (!this.user.fname || !this.user.lname || !/^[0-9]{10}$/.test(this.user.phoneNumber)) {
+    if (!this.user.first_name || !this.user.last_name || !/^[0-9]{10}$/.test(this.user.phone_no)) {
       alert("Please enter valid details!");
       return;
     }
     try {
-      const token = localStorage.getItem('userToken');
       await axios.put('http://localhost:3000/auth/editprofile', this.user, { withCredentials: true });
 
       this.isEditing = false;

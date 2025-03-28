@@ -31,12 +31,12 @@ export class RegisterComponent {
     }
 
     this.registerForm = this.fb.group({
-      fname: ['', [
+      first_name: ['', [
         Validators.required,
         Validators.minLength(2),
         Validators.pattern(/^[a-zA-Z]+$/)
       ]],
-      lname: ['', [
+      last_name: ['', [
         Validators.required,
         Validators.minLength(2),
         Validators.pattern(/^[a-zA-Z]+$/)
@@ -52,7 +52,7 @@ export class RegisterComponent {
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
       ]],
       confirmPassword: ['', [Validators.required]],
-      phoneNumber: ['', [
+      phone_no: ['', [
         Validators.required,
         Validators.pattern(/^[0-9]{10}$/),
         Validators.minLength(10),
@@ -91,7 +91,6 @@ export class RegisterComponent {
     const password = this.registerForm.get('password')?.value;
     if (!password) return '';
     
-    // Check password strength
     const hasLetters = /[a-zA-Z]/.test(password);
     const hasNumbers = /\d/.test(password);
     const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(password);
@@ -131,11 +130,10 @@ export class RegisterComponent {
     this.message = '';
 
     try {
-      const response = await this.authService.register(this.registerForm.value);
+      await this.authService.register(this.registerForm.value);
       this.message = 'Registration successful! Redirecting...';
       this.isSuccess = true;
       
-      // Redirect after short delay
       setTimeout(() => {
         this.router.navigate(['/home/new-poll']);
       }, 1500);
@@ -147,4 +145,4 @@ export class RegisterComponent {
       this.isSubmitting = false;
     }
   }
-}
+} 

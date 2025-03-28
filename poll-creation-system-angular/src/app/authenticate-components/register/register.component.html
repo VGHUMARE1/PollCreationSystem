@@ -6,44 +6,42 @@
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="register()" class="register-form">
-      <!-- Two-column layout for names on larger screens -->
       <div class="form-row">
         <div class="form-group">
-          <label for="fname">First Name</label>
+          <label for="first_name">First Name</label>
           <input 
-            id="fname" 
+            id="first_name" 
             type="text" 
             placeholder="Enter your first name" 
-            formControlName="fname"
-            [class.invalid]="isInvalid('fname')"
+            formControlName="first_name"
+            [class.invalid]="isInvalid('first_name')"
             autocomplete="given-name"
           />
-          <div class="error" *ngIf="isInvalid('fname')">
-            <span *ngIf="registerForm.get('fname')?.errors?.['required']">First name is required</span>
-            <span *ngIf="registerForm.get('fname')?.errors?.['minlength']">Minimum 2 characters</span>
-            <span *ngIf="registerForm.get('fname')?.errors?.['pattern']">Only letters allowed</span>
+          <div class="error" *ngIf="isInvalid('first_name')">
+            <span *ngIf="registerForm.get('first_name')?.errors?.['required']">First name is required</span>
+            <span *ngIf="registerForm.get('first_name')?.errors?.['minlength']">Minimum 2 characters</span>
+            <span *ngIf="registerForm.get('first_name')?.errors?.['pattern']">Only letters allowed</span>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="lname">Last Name</label>
+          <label for="last_name">Last Name</label>
           <input 
-            id="lname" 
+            id="last_name" 
             type="text" 
             placeholder="Enter your last name" 
-            formControlName="lname"
-            [class.invalid]="isInvalid('lname')"
+            formControlName="last_name"
+            [class.invalid]="isInvalid('last_name')"
             autocomplete="family-name"
           />
-          <div class="error" *ngIf="isInvalid('lname')">
-            <span *ngIf="registerForm.get('lname')?.errors?.['required']">Last name is required</span>
-            <span *ngIf="registerForm.get('lname')?.errors?.['minlength']">Minimum 2 characters</span>
-            <span *ngIf="registerForm.get('lname')?.errors?.['pattern']">Only letters allowed</span>
+          <div class="error" *ngIf="isInvalid('last_name')">
+            <span *ngIf="registerForm.get('last_name')?.errors?.['required']">Last name is required</span>
+            <span *ngIf="registerForm.get('last_name')?.errors?.['minlength']">Minimum 2 characters</span>
+            <span *ngIf="registerForm.get('last_name')?.errors?.['pattern']">Only letters allowed</span>
           </div>
         </div>
       </div>
 
-      <!-- Email -->
       <div class="form-group">
         <label for="email">Email Address</label>
         <input 
@@ -64,20 +62,19 @@
         </div>
       </div>
 
-      <!-- Password -->
       <div class="form-group">
         <label for="password">Password</label>
         <div class="password-container">
           <input 
             id="password" 
-            type="password" 
+            [type]="showPassword ? 'text' : 'password'" 
             placeholder="Create a password" 
             formControlName="password"
             [class.invalid]="isInvalid('password')"
             autocomplete="new-password"
           />
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility('password')">
-            👁️
+            {{ showPassword ? '🙈' : '👁️' }}
           </button>
         </div>
         <div class="error" *ngIf="isInvalid('password')">
@@ -87,58 +84,41 @@
             Must include uppercase, lowercase, number, and special character
           </span>
         </div>
-        <div class="password-strength" *ngIf="registerForm.get('password')?.value">
-          Password strength: 
-          <span [class]="getPasswordStrengthClass()">{{ getPasswordStrength() }}</span>
-        </div>
       </div>
 
-      <!-- Confirm Password -->
       <div class="form-group">
         <label for="confirmPassword">Confirm Password</label>
-        <div class="password-container">
-          <input 
-            id="confirmPassword" 
-            type="password" 
-            placeholder="Confirm your password" 
-            formControlName="confirmPassword"
-            [class.invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched"
-            autocomplete="new-password"
-          />
-          <button type="button" class="toggle-password" (click)="togglePasswordVisibility('confirmPassword')">
-            👁️
-          </button>
-        </div>
+        <input 
+          id="confirmPassword" 
+          [type]="showConfirmPassword ? 'text' : 'password'" 
+          placeholder="Confirm your password" 
+          formControlName="confirmPassword"
+          [class.invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched"
+          autocomplete="new-password"
+        />
         <div class="error" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched">
           Passwords do not match
         </div>
       </div>
 
-      <!-- Phone Number -->
       <div class="form-group">
-        <label for="phoneNumber">Phone Number</label>
+        <label for="phone_no">Phone Number</label>
         <input 
-          id="phoneNumber" 
+          id="phone_no" 
           type="tel" 
           placeholder="Enter your 10-digit phone number" 
-          formControlName="phoneNumber"
-          [class.invalid]="isInvalid('phoneNumber')"
+          formControlName="phone_no"
+          [class.invalid]="isInvalid('phone_no')"
           autocomplete="tel"
         />
-        <div class="error" *ngIf="isInvalid('phoneNumber')">
-          <span *ngIf="registerForm.get('phoneNumber')?.errors?.['required']">Phone number is required</span>
-          <span *ngIf="registerForm.get('phoneNumber')?.errors?.['pattern']">Please enter a valid 10-digit number</span>
+        <div class="error" *ngIf="isInvalid('phone_no')">
+          <span *ngIf="registerForm.get('phone_no')?.errors?.['required']">Phone number is required</span>
+          <span *ngIf="registerForm.get('phone_no')?.errors?.['pattern']">Please enter a valid 10-digit number</span>
         </div>
       </div>
 
-      <!-- Terms and Conditions -->
       <div class="form-group terms">
-        <input 
-          type="checkbox" 
-          id="terms" 
-          formControlName="terms"
-          [class.invalid]="registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched"
-        />
+        <input type="checkbox" id="terms" formControlName="terms" />
         <label for="terms">
           I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
         </label>
@@ -147,28 +127,18 @@
         </div>
       </div>
 
-      <!-- Submit Button -->
-      <button 
-        type="submit" 
-        class="submit-btn" 
-        [disabled]="registerForm.invalid || emailExists || isSubmitting"
-        [class.loading]="isSubmitting"
-      >
+      <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || emailExists || isSubmitting">
         <span *ngIf="!isSubmitting">Create Account</span>
         <span *ngIf="isSubmitting">Creating account...</span>
       </button>
 
-   
-
-      <!-- Login Link -->
       <div class="login-link">
-        Already have an account? <a href="/login">Sign in</a>
+        Already have an account? <a routerLink="/login">Sign in</a>
       </div>
     </form>
 
-    <!-- Status Message -->
     <div class="message" [class.success]="isSuccess" [class.error]="!isSuccess && message" *ngIf="message">
       {{ message }}
     </div>
   </div>
-</div>
+</div>  
