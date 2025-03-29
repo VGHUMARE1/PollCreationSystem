@@ -17,20 +17,20 @@ export class AuthService {
   }
 
   async register(user: any) {
-    console.log(user);
+    // console.log(user);
     let response = await axios.post(`${this.apiUrl}/register`, user);
-    console.log(response);
+    // console.log(response);
     return response;
   }
 
   async login(credentials: any) {
     const { email, password } = credentials;
-    const secretKey = 'your-secret-key'; // Use a strong secret key
+    const secretKey = 'topSecret'; //  secret key
     const encryptedPayload = {
       email: email,
       password: this.encryptData(password, secretKey),
     };
-    console.log('login', encryptedPayload);
+    // console.log('login', encryptedPayload);
     try {
       const response = await axios.post(
         `${this.apiUrl}/login`,
@@ -39,15 +39,13 @@ export class AuthService {
       );
       console.log('response', response);
       if (response.data) {
-        console.log(response.data.user);
+        // console.log(response.data.user);
         this.cookieService.set('session', 'true', { path: '/' });
         this.cookieService.set('user', response.data.user, { path: '/' });
-        // console.log(JSON.parse(this.cookieService.get('user')));
-        // localStorage.setItem("us")
       }
       return response;
     } catch (error) {
-      console.log('error auth', error);
+      // console.log('error auth', error);
       throw error;
     }
   }
@@ -56,7 +54,7 @@ export class AuthService {
     const response = await axios.get(`${this.apiUrl}/logout`, {
       withCredentials: true,
     });
-    console.log(response);
+    // console.log(response);
     this.cookieService.delete('session', '/');
   }
 
@@ -69,7 +67,7 @@ export class AuthService {
       const response = await axios.post(`${this.apiUrl}/check-email`, {
         email,
       });
-      return response.data; // Assuming the backend returns a boolean
+      return response.data; //from backend in response boolean value return
     } catch (error) {
       // console.error('Error checking email:', error);
       throw error;

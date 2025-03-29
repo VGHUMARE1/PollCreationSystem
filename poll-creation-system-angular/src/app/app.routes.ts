@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './authenticate-components/login/login.component';
 import { RegisterComponent } from './authenticate-components/register/register.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { SidebarComponent } from './landing-page-components/sidebar/sidebar.component';
 import { HomeComponent } from './landing-page-components/home/home.component';
 import { PollFormComponent } from './poll-components/poll-form/poll-form.component';

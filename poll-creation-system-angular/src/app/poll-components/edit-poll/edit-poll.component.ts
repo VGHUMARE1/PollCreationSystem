@@ -66,9 +66,10 @@ export class EditPollComponent implements OnInit {
       this.pollData = response.data;
       this.totalVotes = this.pollData.voters?.length || 0;
       this.populateAllFormFields();
+     
     } catch (error) {
       console.error('Error fetching poll:', error);
-      this.showToast('Failed to load poll data. Please try again.', 'error');
+      alert('Failed to load poll data. Please try again.');
       this.router.navigate(['/polls']);
     } finally {
       this.loading = false;
@@ -126,7 +127,10 @@ export class EditPollComponent implements OnInit {
   }
 
   async updatePollDetails() {
-    if (this.pollForm.invalid) return;
+    if (this.pollForm.invalid) {
+      alert('Please fix all errors before submitting.');
+      return;
+    }
 
     this.savingDetails = true;
     try {
@@ -140,79 +144,59 @@ export class EditPollComponent implements OnInit {
         allowMultipleSelect: allowMultiple,
         options,
       };
-      console.log(data);
-     const response= await axios.put(`http://localhost:3000/polls/update`, data, {
+      
+      const response = await axios.put(`http://localhost:3000/polls/update`, data, {
         withCredentials: true,
       });
-      console.log(response);
-      alert(response.data);
-
-      this.showToast('Poll details updated successfully!', 'success');
+      
+      alert('Poll details updated successfully!');
+      this.pollData.question = question;
     } catch (error) {
       console.error('Error updating poll details:', error);
-      this.showToast(
-        'Failed to update poll details. Please try again.',
-        'error'
-      );
+      alert('Failed to update poll details. Please try again.');
     } finally {
       this.savingDetails = false;
     }
   }
 
   async updateExpiryDate() {
-    if (this.expiryForm.invalid) return;
-
+    if (this.expiryForm.invalid) {
+      alert('Please select a valid future date and time.');
+      return;
+    }
+  
     this.savingExpiry = true;
     try {
       const date = new Date(this.expiryForm.value.expiryDateTime);
-      // Format the date manually to avoid the 'Z' at the end
       const expiryDateTime =
         date.getFullYear() +
-        '-' +
-        String(date.getMonth() + 1).padStart(2, '0') +
-        '-' +
-        String(date.getDate()).padStart(2, '0') +
-        'T' +
-        String(date.getHours()).padStart(2, '0') +
-        ':' +
-        String(date.getMinutes()).padStart(2, '0') +
-        ':00';
-
-      await axios.put(
+        '-' + String(date.getMonth() + 1).padStart(2, '0') +
+        '-' + String(date.getDate()).padStart(2, '0') +
+        'T' + String(date.getHours()).padStart(2, '0') +
+        ':' + String(date.getMinutes()).padStart(2, '0') +
+        ':00.000000';
+  
+      const response = await axios.put(
         `http://localhost:3000/polls/expiry/${this.pollId}`,
-        { expiryDateTime },
+       { expiryDateTime:expiryDateTime},
         { withCredentials: true }
       );
-
+  
+      console.log("Expiry Date Updated:", response.data);
       this.originalExpiryDate = expiryDateTime;
-      this.showToast('Expiry date updated successfully!', 'success');
-    } catch (error) {
-      console.error('Error updating expiry date:', error);
-      this.showToast(
-        'Failed to update expiry date. Please try again.',
-        'error'
-      );
+      this.pollData.expiryDateTime = expiryDateTime;
+      alert(`Expiry date updated successfully for Poll ID: ${this.pollId}`);
+    } catch (error:any) {
+      console.error("Error updating expiry date:", error.response?.data || error.message);
+      alert(error.response?.data?.message || "Failed to update expiry date. Please try again.");
     } finally {
       this.savingExpiry = false;
     }
   }
-
   hasExpiryChanged(): boolean {
     if (!this.originalExpiryDate) return false;
     const newDate = new Date(this.expiryForm.value.expiryDateTime);
     const originalDate = new Date(this.originalExpiryDate);
     return newDate.getTime() !== originalDate.getTime();
-  }
-
-  showToast(message: string, type: 'success' | 'error') {
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.innerHTML = `
-      <i class="bi ${
-        type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle'
-      }"></i>
-      <span>${message}</span>
-    `;
-    document.body.appendChild(toast);
   }
 }

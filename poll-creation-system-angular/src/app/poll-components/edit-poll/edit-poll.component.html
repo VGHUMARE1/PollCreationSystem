@@ -14,7 +14,7 @@
     
     <div class="card-body">
       <!-- Poll Details Tab -->
-      <div *ngIf="activeTab === 'details'" class="tab-content" [@tabAnimation]>
+      <div *ngIf="activeTab === 'details'" class="tab-content">
         <form [formGroup]="pollForm" (ngSubmit)="updatePollDetails()">
           <div class="form-group mb-4">
             <label class="form-label">Poll Question *</label>
@@ -37,7 +37,7 @@
 
           <div class="form-group mb-4" formArrayName="options">
             <label class="form-label">Poll Options * (Minimum 2)</label>
-            <div *ngFor="let option of options.controls; let i = index" class="option-group mb-3" @optionAnimation>
+            <div *ngFor="let option of options.controls; let i = index" class="option-group mb-3">
               <div class="input-group">
                 <input type="text" [formControlName]="i" class="form-control" 
                       [ngClass]="{ 'is-invalid': option.invalid && (option.touched || option.dirty) }" 
@@ -77,7 +77,7 @@
       </div>
 
       <!-- Expiry Date Tab -->
-      <div *ngIf="activeTab === 'expiry'" class="tab-content" [@tabAnimation]>
+      <div *ngIf="activeTab === 'expiry'" class="tab-content">
         <form [formGroup]="expiryForm" (ngSubmit)="updateExpiryDate()">
           <div class="expiry-info">
             <h4><i class="bi bi-info-circle"></i> Current Expiry</h4>

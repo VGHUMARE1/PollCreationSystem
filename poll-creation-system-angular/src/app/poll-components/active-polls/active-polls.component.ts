@@ -124,13 +124,13 @@ constructor(private router: Router) {}
       };
   
       const response = await axios.post('http://localhost:3000/polls/vote', payload, { withCredentials: true });
-      console.log(response.data);
-      alert(response.data);
-      this.router.navigate([`/home/voted-polls`]);
+      // console.log("Vote Successful:", response.data);
+      alert(response.data.message);
+      this.router.navigate(['/home/voted-polls']);
       this.fetchActivePolls();
-    } catch (error) {
-      alert(error);
-      console.error('Error submitting vote:', error);
+    } catch (error:any) {
+     
+      alert(error.response?.data?.message || "An error occurred while submitting your vote.");
     }
   }
 

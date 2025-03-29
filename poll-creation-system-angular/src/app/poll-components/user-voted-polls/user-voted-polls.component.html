@@ -1,7 +1,5 @@
 <div class="polls-app">
   <div class="glass-container">
-    <!-- ... (keep existing header code) ... -->
-
     <div *ngIf="votedPolls.length > 0; else noPolls" class="poll-grid">
       <div *ngFor="let poll of displayedPolls; trackBy: trackByPollId" class="poll-card voted">
         <div class="card-header">
@@ -30,12 +28,12 @@
         <!-- Edit mode (when editing) -->
         <div class="options" *ngIf="editingPollId === poll._id">
           <div *ngFor="let option of poll.options; let i = index" class="option">
-            <label>
+            <label (click)="toggleOptionSelection(poll, i)">
               <input 
                 [type]="poll.allowMultiple ? 'checkbox' : 'radio'"
                 [name]="'poll_' + poll._id"
-                [(ngModel)]="poll.selectedOptions![i]"
-                [checked]="poll.selectedOptions![i]">
+                [checked]="poll.selectedOptions![i]"
+                (click)="$event.preventDefault()">
               <span class="custom-control"></span>
               <span class="option-text">{{option.optionText}}</span>
             </label>
@@ -49,22 +47,18 @@
           </div>
           
           <div class="action-buttons">
-            <!-- Delete Vote Button -->
             <button class="btn-delete" (click)="deleteVote(poll._id)">
               <i class="fas fa-trash-alt"></i> Delete Vote
             </button>
             
-            <!-- Edit/Change Vote Button -->
             <button *ngIf="editingPollId !== poll._id" class="btn-edit" (click)="toggleEditMode(poll._id)">
               <i class="fas fa-edit"></i> Change Vote
             </button>
             
-            <!-- Save Changes Button -->
             <button *ngIf="editingPollId === poll._id" class="btn-save" (click)="changeVote(poll)">
               <i class="fas fa-save"></i> Save Changes
             </button>
             
-            <!-- Cancel Button -->
             <button *ngIf="editingPollId === poll._id" class="btn-cancel" (click)="toggleEditMode(poll._id)">
               <i class="fas fa-times"></i> Cancel
             </button>

@@ -1,40 +1,74 @@
-<div class="sidebar">
+<div class="sidebar" [class.collapsed]="isCollapsed">
   <div class="sidebar-header">
-    <h4>Menu</h4>
-    <button class="toggle-btn" (click)="toggleSidebar()">☰</button>
+    <div class="header-content">
+      <div class="profile-image">
+        <span class="initials">{{ initials }}</span>
+      </div>
+      <div *ngIf="!isCollapsed" class="user-info">
+        <h5>{{ (userProfile?.first_name + ' ' + userProfile?.last_name) || userProfile?.email }}</h5>
+        <p *ngIf="userProfile?.phone_no">{{ userProfile?.phone_no }}</p>
+      </div>
+      <button class="toggle-btn" (click)="toggleSidebar()">
+        {{ isCollapsed ? '☰' : '×' }}
+      </button>
+    </div>
   </div>
 
-  <ul class="nav flex-column">
-    <li class="nav-item">
-      <a href="/home/new-poll" class="nav-link" [class.active]="isActive('/home/new-poll')">
-        <i class="bi bi-house-door-fill"></i> <span>Home</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="/home/my-polls" class="nav-link" [class.active]="isActive('/home/my-polls')">
-        <i class="bi bi-bar-chart-fill"></i> <span>Your Polls</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="/home/active-polls" class="nav-link" [class.active]="isActive('/home/active-polls')">
-        <i class="bi bi-clipboard-check-fill"></i> <span>Active Polls</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="/home/voted-polls" class="nav-link" [class.active]="isActive('/home/voted-polls')">
-        <i class="bi bi-check-circle-fill"></i> <span>Voted Polls</span>
-      </a>
-    </li>
-    <li class="nav-item">
-      <a href="/home/profile" class="nav-link" [class.active]="isActive('/home/profile')">
-        <i class="bi bi-person-circle"></i> <span>Profile</span>
-      </a>
-    </li>
-  </ul>
+  <div class="sidebar-content">
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-section">
+      <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
 
-  <div class="logout-container">
+    <!-- Error State -->
+    <div *ngIf="profileError && !isLoading" class="error-section">
+      <p class="text-warning">{{ profileError }}</p>
+      <button class="btn btn-sm btn-outline-light" (click)="loadUserProfile()">
+        Retry
+      </button>
+    </div>
+
+    <!-- Navigation Links -->
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a routerLink="/home/new-poll" class="nav-link" [class.active]="isActive('/home/new-poll')">
+          <i class="bi bi-house-door-fill"></i>
+          <span *ngIf="!isCollapsed">Home</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/home/my-polls" class="nav-link" [class.active]="isActive('/home/my-polls')">
+          <i class="bi bi-bar-chart-fill"></i>
+          <span *ngIf="!isCollapsed">Your Polls</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/home/active-polls" class="nav-link" [class.active]="isActive('/home/active-polls')">
+          <i class="bi bi-clipboard-check-fill"></i>
+          <span *ngIf="!isCollapsed">Active Polls</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/home/voted-polls" class="nav-link" [class.active]="isActive('/home/voted-polls')">
+          <i class="bi bi-check-circle-fill"></i>
+          <span *ngIf="!isCollapsed">Voted Polls</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a routerLink="/home/profile" class="nav-link" [class.active]="isActive('/home/profile')">
+          <i class="bi bi-person-circle"></i>
+          <span *ngIf="!isCollapsed">Profile</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="sidebar-footer">
     <a class="nav-link logout-btn" (click)="logout()">
-      <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+      <i class="bi bi-box-arrow-right"></i>
+      <span *ngIf="!isCollapsed">Logout</span>
     </a>
   </div>
 </div>

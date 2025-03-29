@@ -70,6 +70,18 @@ export class UserVotedPollsComponent implements OnInit {
     this.editingPollId = this.editingPollId === pollId ? null : pollId;
   }
 
+  toggleOptionSelection(poll: VotedPoll, index: number) {
+    if (poll.allowMultiple) {
+      poll.selectedOptions![index] = !poll.selectedOptions![index];
+    } else {
+      if (poll.selectedOptions![index]) {
+        poll.selectedOptions = poll.selectedOptions!.map(() => false);
+      } else {
+        poll.selectedOptions = poll.selectedOptions!.map((_, i) => i === index);
+      }
+    }
+  }
+
   async deleteVote(pollId: number) {
     if (!confirm('Are you sure you want to delete your vote?')) return;
   
@@ -79,14 +91,12 @@ export class UserVotedPollsComponent implements OnInit {
       });
   
       alert(response.data.msg || "Vote deleted successfully");
-      console.log(response);
       this.fetchUserVotedPolls();
     } catch (error: any) {
       console.error('Error deleting vote:', error);
   
       if (error.response) {
         const { status, data } = error.response;
-      //  console.log(data.msg.message);
         if (status === 400) {
           alert(data.msg.message || "Bad Request: Invalid Poll ID or Email");
         } else if (status === 500) {
@@ -99,7 +109,6 @@ export class UserVotedPollsComponent implements OnInit {
       }
     }
   }
-  
 
   async changeVote(poll: VotedPoll) {
     if (!poll.selectedOptions?.some(selected => selected)) {
@@ -108,22 +117,19 @@ export class UserVotedPollsComponent implements OnInit {
     }
   
     try {
-      // Extract selected option IDs
       const optionIds = poll.options
         .filter((_, index) => poll.selectedOptions?.[index])
-        .map(opt => opt.id); // Only sending option IDs
+        .map(opt => opt.id);
   
       const requestData = {
-        pollId: poll._id, // Ensure pollId is correctly set
-        voterEmail: "akankshbodakhe@gmail.com", // Ensure voterEmail is included
-        optionIds: optionIds // Sending as an array of IDs
+        pollId: poll._id,
+        optionIds: optionIds
       };
   
       const response = await axios.put(`http://localhost:3000/polls/changeVote`, requestData, {
         withCredentials: true
       });
   
-      // Handling the backend response properly
       if (response.data.message === "Vote changed successfully.") {
         alert('Vote changed successfully!');
         this.editingPollId = null;
@@ -134,7 +140,6 @@ export class UserVotedPollsComponent implements OnInit {
     } catch (error: any) {
       console.error('Error changing vote:', error.response?.data || error.message);
   
-      // Handle known backend error responses
       if (error.response) {
         alert(error.response.data?.message || "An error occurred while changing the vote.");
       } else {
@@ -142,7 +147,6 @@ export class UserVotedPollsComponent implements OnInit {
       }
     }
   }
-  
 
   get displayedPolls(): VotedPoll[] {
     const startIndex = (this.currentPage - 1) * this.pollsPerPage;

@@ -88,7 +88,7 @@ export class PollFormComponent implements OnInit {
     try {
       await axios.post('http://localhost:3000/polls', pollData, { withCredentials: true });
       alert('Poll successfully created');
-      this.router.navigate(['/polls/my-polls']);
+      this.router.navigate(['/home/my-polls']);
     } catch (error : any) {
       console.error('Error creating poll:', error);
       alert(error.response?.data?.message || 'Failed to create poll. Please try again.');
