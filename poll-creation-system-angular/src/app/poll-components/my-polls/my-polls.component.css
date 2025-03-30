@@ -1,15 +1,15 @@
 /* My Polls Component - Glassmorphism Style */
 :host {
-  --primary: #7F5AF0;       /* Vibrant purple */
-  --primary-light: #a29bfe; /* Lighter purple */
-  --primary-dark: #6C3CE6;  /* Darker purple */
-  --secondary: #2CB67D;     /* Teal green */
-  --accent: #FF7E6B;       /* Coral */
-  --dark: #16161A;         /* Dark navy */
-  --light: #F9F9F9;        /* Light gray */
-  --text-dark: #242629;    /* Dark text */
-  --text-light: #FFFFFE;   /* Light text */
-  --glass: rgba(255, 255, 255, 0.2);
+  --primary: #00ADB5;       /* Teal */
+  --primary-light: #5fd3db; /* Lighter teal */
+  --primary-dark: #00878f;  /* Darker teal */
+  --secondary: #393E46;     /* Dark gray */
+  --accent: #FF7E6B;       /* Coral (kept for contrast) */
+  --dark: #222831;         /* Dark navy */
+  --light: #EEEEEE;        /* Off-white */
+  --text-dark: #393E46;    /* Dark text */
+  --text-light: #EEEEEE;   /* Light text */
+  --glass: rgba(57, 62, 70, 0.5);
   --border-radius: 12px;
   --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -17,12 +17,11 @@
 
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0F0E17 0%, #1A1A2E 100%);
+  background: linear-gradient(135deg, #222831 0%, #393E46 100%);
   padding: 2rem;
   font-family: 'Poppins', sans-serif;
   color: var(--text-light);
 }
-
 
 .logo {
   display: flex;
@@ -39,16 +38,15 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(to right, var(--primary), var(--accent));
+  background: linear-gradient(to right, var(--primary), var(--primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-
 .title {
   font-size: 2.5rem;
   margin-bottom: 2rem;
-  background: linear-gradient(to right, var(--primary), var(--accent));
+  background: linear-gradient(to right, var(--primary), var(--primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
@@ -59,7 +57,7 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: var(--border-radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(238, 238, 238, 0.1);
   box-shadow: var(--box-shadow);
   padding: 2rem;
   margin-bottom: 2rem;
@@ -68,7 +66,7 @@
 
 .poll-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(127, 90, 240, 0.3);
+  box-shadow: 0 10px 20px rgba(0, 173, 181, 0.3);
 }
 
 .card-title {
@@ -79,7 +77,7 @@
 }
 
 .text-muted {
-  color: rgba(255, 255, 255, 0.7) !important;
+  color: rgba(238, 238, 238, 0.7) !important;
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -96,7 +94,7 @@
 }
 
 .bg-success {
-  background-color: var(--secondary) !important;
+  background-color: var(--primary) !important;
 }
 
 .bg-danger {
@@ -111,8 +109,8 @@
 }
 
 .list-group-item {
-  background: rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(34, 40, 49, 0.3);
+  border: 1px solid rgba(238, 238, 238, 0.1);
   color: var(--text-light);
   padding: 1rem 1.5rem;
   display: flex;
@@ -147,14 +145,14 @@
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 4px 15px rgba(127, 90, 240, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 173, 181, 0.4);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .btn-analysis:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(127, 90, 240, 0.6);
+  box-shadow: 0 6px 20px rgba(0, 173, 181, 0.6);
 }
 
 /* Pagination Controls */
@@ -167,7 +165,7 @@
 }
 
 .btn-nav {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(238, 238, 238, 0.1);
   color: white;
   border: none;
   padding: 0.6rem 1.5rem;
@@ -251,11 +249,11 @@
   align-items: center;
   min-height: 60vh;
   text-align: center;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(57, 62, 70, 0.3);
   border-radius: var(--border-radius);
   padding: 3rem;
   margin-top: 2rem;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border: 1px dashed rgba(238, 238, 238, 0.1);
 }
 
 .no-polls-content {
@@ -276,7 +274,7 @@
 }
 
 .no-polls-message {
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(238, 238, 238, 0.7);
   font-size: 1.1rem;
   margin-bottom: 2rem;
   line-height: 1.6;
@@ -291,7 +289,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 4px 15px rgba(127, 90, 240, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 173, 181, 0.4);
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
@@ -299,7 +297,7 @@
 
 .btn-create:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(127, 90, 240, 0.6);
+  box-shadow: 0 6px 20px rgba(0, 173, 181, 0.6);
 }
 
 .btn-create i {

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import axios from 'axios';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 interface UserProfile {
   email: string;
@@ -23,7 +24,7 @@ export class SidebarComponent implements OnInit {
   profileError: string | null = null;
   userProfile: UserProfile | null = null;
 
-  constructor(private router: Router) {}
+  constructor( private authService: AuthService,private router: Router) {}
 
   async ngOnInit() {
     await this.loadUserProfile();
@@ -69,13 +70,11 @@ export class SidebarComponent implements OnInit {
 
   async logout() {
     try {
-      await axios.post('http://localhost:3000/logout', {}, { 
-        withCredentials: true 
-      });
-      this.userProfile = null;
-      this.router.navigate(['/login']);
+      const response = await this.authService.logout();
+      console.log(response);
+      this.router.navigate(['/']);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.log(error);
     }
   }
 

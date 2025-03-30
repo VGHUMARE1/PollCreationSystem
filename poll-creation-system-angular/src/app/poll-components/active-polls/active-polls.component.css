@@ -1,14 +1,14 @@
-/* Modern Glassmorphism Design */
+/* Modern Glassmorphism Design with New Color Scheme */
 :host {
-  --primary: #7F5AF0;
-  --primary-dark: #6C3CE6;
-  --secondary: #2CB67D;
+  --primary: #00ADB5;
+  --primary-dark: #00878f;
+  --secondary: #393E46;
   --accent: #FF7E6B;
-  --dark: #16161A;
-  --light: #F9F9F9;
-  --glass: rgba(255, 255, 255, 0.2);
-  --text-dark: #242629;
-  --text-light: #FFFFFE;
+  --dark: #222831;
+  --light: #EEEEEE;
+  --glass: rgba(34, 40, 49, 0.5);
+  --text-dark: #222831;
+  --text-light: #EEEEEE;
   --border-radius: 12px;
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -16,16 +16,16 @@
 .no-polls-message {
   text-align: center;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(57, 62, 70, 0.5);
   border-radius: 10px;
   margin: 2rem 0;
-  color: #fff;
+  color: var(--text-light);
 }
 
 .no-polls-message i {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #4dabf7;
+  color: var(--primary);
 }
 
 .no-polls-message h3 {
@@ -40,7 +40,7 @@
 
 .polls-app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0F0E17 0%, #1A1A2E 100%);
+  background: linear-gradient(135deg, var(--dark) 0%, #2a313b 100%);
   padding: 2rem;
   font-family: 'Poppins', sans-serif;
 }
@@ -50,7 +50,7 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: var(--border-radius);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(238, 238, 238, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   padding: 2rem;
   max-width: 1200px;
@@ -81,21 +81,21 @@
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
-  background: linear-gradient(to right, var(--primary), var(--accent));
+  background: linear-gradient(to right, var(--primary), var(--primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .page-indicator {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(57, 62, 70, 0.7);
   padding: 0.6rem 1.2rem;
   border-radius: 50px;
-  color: white;
+  color: var(--text-light);
   font-weight: 600;
 }
 
 .current {
-  color: var(--primary-light);
+  color: var(--primary);
   font-size: 1.2rem;
 }
 
@@ -112,16 +112,16 @@
 }
 
 .poll-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(57, 62, 70, 0.3);
   border-radius: var(--border-radius);
   overflow: hidden;
   transition: var(--transition);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(238, 238, 238, 0.1);
 }
 
 .poll-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(127, 90, 240, 0.3);
+  box-shadow: 0 10px 20px rgba(0, 173, 181, 0.3);
 }
 
 .card-header {
@@ -147,7 +147,7 @@
 }
 
 .poll-type.single {
-  background: var(--secondary);
+  background: var(--primary);
   color: white;
 }
 
@@ -162,7 +162,7 @@
   display: flex;
   gap: 1.5rem;
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(238, 238, 238, 0.7);
 }
 
 .poll-meta i {
@@ -183,13 +183,13 @@
   align-items: center;
   padding: 1rem;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(34, 40, 49, 0.5);
   cursor: pointer;
   transition: var(--transition);
 }
 
 .option label:hover {
-  background: rgba(127, 90, 240, 0.1);
+  background: rgba(0, 173, 181, 0.1);
 }
 
 input[type="checkbox"], 
@@ -238,15 +238,15 @@ input:checked + .custom-control::after {
   justify-content: space-between;
   align-items: center;
   padding: 1.2rem 1.5rem;
-  background: rgba(0, 0, 0, 0.2);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(34, 40, 49, 0.5);
+  border-top: 1px solid rgba(238, 238, 238, 0.05);
 }
 
 .votes {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(238, 238, 238, 0.7);
   font-size: 0.9rem;
 }
 
@@ -262,12 +262,12 @@ input:checked + .custom-control::after {
   gap: 0.8rem;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 4px 15px rgba(127, 90, 240, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 173, 181, 0.4);
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(127, 90, 240, 0.6);
+  box-shadow: 0 6px 20px rgba(0, 173, 181, 0.6);
 }
 
 /* Pagination */
@@ -282,7 +282,7 @@ input:checked + .custom-control::after {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(57, 62, 70, 0.5);
   border: none;
   color: white;
   cursor: pointer;
@@ -311,7 +311,7 @@ input:checked + .custom-control::after {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(57, 62, 70, 0.5);
   border: none;
   color: white;
   cursor: pointer;
@@ -325,7 +325,7 @@ input:checked + .custom-control::after {
 }
 
 .page-btn:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(57, 62, 70, 0.7);
 }
 
 /* Responsive Design */

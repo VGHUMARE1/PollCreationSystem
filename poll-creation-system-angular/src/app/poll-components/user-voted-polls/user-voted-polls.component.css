@@ -1,79 +1,75 @@
 /* User Voted Polls Component Styles */
 :host {
-    --primary: #7F5AF0;       /* Vibrant purple */
-    --primary-light: #a29bfe; /* Lighter purple */
-    --primary-dark: #6C3CE6;  /* Darker purple */
-    --secondary: #2CB67D;     /* Teal green */
-    --accent: #FF7E6B;       /* Coral */
-    --dark: #16161A;         /* Dark navy */
-    --light: #F9F9F9;        /* Light gray */
-    --text-dark: #242629;    /* Dark text */
-    --text-light: #FFFFFE;   /* Light text */
-    --glass: rgba(255, 255, 255, 0.2);
-    --border-radius: 12px;
-    --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  }
-  
-  .polls-app {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #0F0E17 0%, #1A1A2E 100%);
-    padding: 2rem;
-    font-family: 'Poppins', sans-serif;
-    color: var(--text-light);
-  }
-  
-  .glass-container {
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: var(--border-radius);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: var(--box-shadow);
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  /* Header Styles */
-  .app-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2.5rem;
-  }
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .logo i {
-    color: var(--primary);
-    font-size: 2.5rem;
-  }
-  
-  .logo h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-    background: linear-gradient(to right, var(--primary), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  
-  .page-indicator {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 0.6rem 1.2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    color: white;
-  }
+  --primary: #00ADB5;       /* Teal */
+  --primary-light: #5fd3db; /* Lighter teal */
+  --primary-dark: #00878f;  /* Darker teal */
+  --secondary: #393E46;     /* Dark gray */
+  --accent: #FF7E6B;       /* Coral (kept for contrast) */
+  --dark: #222831;         /* Dark navy */
+  --light: #EEEEEE;        /* Off-white */
+  --text-dark: #393E46;    /* Dark text */
+  --text-light: #EEEEEE;   /* Light text */
+  --glass: rgba(57, 62, 70, 0.5);
+  --border-radius: 12px;
+  --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
 
+.polls-app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #222831 0%, #393E46 100%);
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text-light);
+}
 
+.glass-container {
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(238, 238, 238, 0.1);
+  box-shadow: var(--box-shadow);
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  
+/* Header Styles */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo i {
+  color: var(--primary);
+  font-size: 2.5rem;
+}
+
+.logo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(to right, var(--primary), var(--primary-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-indicator {
+  background: rgba(57, 62, 70, 0.7);
+  padding: 0.6rem 1.2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  color: var(--text-light);
+}
 
 .action-buttons {
   display: flex;
@@ -90,30 +86,32 @@
   align-items: center;
   gap: 5px;
   font-size: 0.9rem;
+  transition: var(--transition);
 }
 
 .btn-edit {
-  background-color: #4CAF50;
-  color: white;
+  background-color: var(--primary);
+  color: var(--text-light);
 }
 
 .btn-save {
   background-color: #2196F3;
-  color: white;
+  color: var(--text-light);
 }
 
 .btn-delete {
   background-color: #f44336;
-  color: white;
+  color: var(--text-light);
 }
 
 .btn-cancel {
   background-color: #ff9800;
-  color: white;
+  color: var(--text-dark);
 }
 
 .btn-edit:hover, .btn-save:hover, .btn-delete:hover, .btn-cancel:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 /* Style for edit mode */
@@ -128,304 +126,304 @@
 .options input[type="radio"] {
   margin-right: 10px;
 }
-  
-  .current {
-    color: var(--primary-light);
-    font-size: 1.2rem;
-  }
-  
-  .total {
-    opacity: 0.7;
-  }
-  
-  /* Poll Cards */
+
+.current {
+  color: var(--primary-light);
+  font-size: 1.2rem;
+}
+
+.total {
+  opacity: 0.7;
+}
+
+/* Poll Cards */
+.poll-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.poll-card {
+  background: rgba(57, 62, 70, 0.3);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  transition: var(--transition);
+  border: 1px solid rgba(238, 238, 238, 0.1);
+}
+
+.poll-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 173, 181, 0.3);
+}
+
+.poll-card.voted {
+  border-left: 4px solid var(--primary);
+}
+
+.card-header {
+  padding: 1.5rem;
+  position: relative;
+}
+
+.poll-status {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.3rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: rgba(0, 173, 181, 0.2);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.poll-status i {
+  font-size: 1rem;
+}
+
+.question {
+  font-size: 1.3rem;
+  margin: 1rem 0;
+  line-height: 1.5;
+  color: var(--text-light);
+}
+
+.poll-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  font-size: 0.85rem;
+  color: rgba(238, 238, 238, 0.7);
+}
+
+.poll-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.poll-meta i {
+  font-size: 0.9rem;
+}
+
+/* Poll Options */
+.options {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.option {
+  margin-bottom: 1rem;
+}
+
+.option-result {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(34, 40, 49, 0.5);
+  transition: var(--transition);
+}
+
+.option-result.user-voted {
+  background: rgba(0, 173, 181, 0.1);
+  border-left: 3px solid var(--primary);
+}
+
+.option-text {
+  flex: 1;
+  color: var(--text-light);
+}
+
+.user-selection {
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-selection i {
+  font-size: 0.8rem;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  background: rgba(34, 40, 49, 0.5);
+  border-top: 1px solid rgba(238, 238, 238, 0.05);
+}
+
+.votes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(238, 238, 238, 0.7);
+  font-size: 0.9rem;
+}
+
+/* No Polls Message */
+.no-polls-message {
+  text-align: center;
+  padding: 3rem;
+  color: rgba(238, 238, 238, 0.7);
+}
+
+.no-polls-message i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--primary-light);
+}
+
+.no-polls-message h3 {
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.no-polls-message p {
+  font-size: 1rem;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(238, 238, 238, 0.1);
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: var(--primary);
+  transform: translateY(-2px);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.page-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(238, 238, 238, 0.1);
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.page-btn.active {
+  background: var(--primary);
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.page-btn:hover:not(.active) {
+  background: rgba(238, 238, 238, 0.2);
+}
+
+.ellipsis {
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  color: var(--text-light);
+  opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
   .poll-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
-  
-  .poll-card {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    transition: var(--transition);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .poll-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(127, 90, 240, 0.3);
-  }
-  
-  .poll-card.voted {
-    border-left: 4px solid var(--secondary);
-  }
-  
-  .card-header {
+}
+
+@media (max-width: 768px) {
+  .glass-container {
     padding: 1.5rem;
-    position: relative;
   }
   
-  .poll-status {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.3rem 1rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: rgba(44, 182, 125, 0.2);
-    color: var(--secondary);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .poll-status i {
-    font-size: 1rem;
-  }
-  
-  .question {
-    font-size: 1.3rem;
-    margin: 1rem 0;
-    line-height: 1.5;
-    color: var(--text-light);
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
   }
   
   .poll-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
+    flex-direction: column;
+    gap: 0.8rem;
   }
   
-  .poll-meta span {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .poll-meta i {
-    font-size: 0.9rem;
-  }
-  
-  /* Poll Options */
-  .options {
-    padding: 0 1.5rem 1.5rem;
-  }
-  
-  .option {
-    margin-bottom: 1rem;
-  }
-  
-  .option-result {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 1rem;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.1);
-    transition: var(--transition);
-  }
-  
-  .option-result.user-voted {
-    background: rgba(44, 182, 125, 0.1);
-    border-left: 3px solid var(--secondary);
-  }
-  
-  .option-text {
-    flex: 1;
-    color: var(--text-light);
-  }
-  
-  .user-selection {
-    color: var(--secondary);
-    font-weight: 500;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .user-selection i {
-    font-size: 0.8rem;
-  }
-  
-  /* Card Footer */
-  .card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.2rem 1.5rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  
-  .votes {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.9rem;
-  }
-  
-  /* No Polls Message */
-  .no-polls-message {
-    text-align: center;
-    padding: 3rem;
-    color: rgba(255, 255, 255, 0.7);
-  }
-  
-  .no-polls-message i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--primary-light);
-  }
-  
-  .no-polls-message h3 {
-    color: var(--text-light);
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
-  }
-  
-  .no-polls-message p {
-    font-size: 1rem;
-    max-width: 400px;
-    margin: 0 auto;
-  }
-  
-  /* Pagination */
   .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
     gap: 1rem;
-    margin-top: 2rem;
-  }
-  
-  .nav-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .nav-btn:hover:not(:disabled) {
-    background: var(--primary);
-    transform: translateY(-2px);
-  }
-  
-  .nav-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
   }
   
   .page-numbers {
-    display: flex;
-    gap: 0.5rem;
+    order: 1;
   }
   
-  .page-btn {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: var(--transition);
+  .nav-btn {
+    width: 100%;
+    border-radius: 50px;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .polls-app {
+    padding: 1rem;
   }
   
-  .page-btn.active {
-    background: var(--primary);
-    color: white;
-    font-weight: 600;
+  .poll-grid {
+    grid-template-columns: 1fr;
   }
   
-  .page-btn:hover:not(.active) {
-    background: rgba(255, 255, 255, 0.2);
+  .question {
+    font-size: 1.1rem;
   }
   
-  .ellipsis {
-    display: flex;
-    align-items: center;
-    padding: 0 0.5rem;
-    color: var(--text-light);
-    opacity: 0.7;
+  .no-polls-message {
+    padding: 2rem 1rem;
   }
   
-  /* Responsive Design */
-  @media (max-width: 992px) {
-    .poll-grid {
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
+  .no-polls-message i {
+    font-size: 2.5rem;
   }
   
-  @media (max-width: 768px) {
-    .glass-container {
-      padding: 1.5rem;
-    }
-    
-    .app-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1.5rem;
-    }
-    
-    .poll-meta {
-      flex-direction: column;
-      gap: 0.8rem;
-    }
-    
-    .pagination {
-      flex-direction: column;
-      gap: 1rem;
-    }
-    
-    .page-numbers {
-      order: 1;
-    }
-    
-    .nav-btn {
-      width: 100%;
-      border-radius: 50px;
-      padding: 0.8rem;
-    }
+  .no-polls-message h3 {
+    font-size: 1.3rem;
   }
-  
-  @media (max-width: 480px) {
-    .polls-app {
-      padding: 1rem;
-    }
-    
-    .poll-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .question {
-      font-size: 1.1rem;
-    }
-    
-    .no-polls-message {
-      padding: 2rem 1rem;
-    }
-    
-    .no-polls-message i {
-      font-size: 2.5rem;
-    }
-    
-    .no-polls-message h3 {
-      font-size: 1.3rem;
-    }
-  }
+}
