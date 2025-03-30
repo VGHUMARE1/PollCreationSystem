@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import axios from 'axios';
+import { PollService } from '../../services/poll.service';
 
 interface PollOption {
   id: number;
@@ -36,34 +36,46 @@ export class UserVotedPollsComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string | null = null;
 
-  ngOnInit() {
-    this.fetchUserVotedPolls();
+  constructor(private pollService: PollService) {}
+
+  async ngOnInit() {
+    await this.loadVotedPolls();
   }
 
-  async fetchUserVotedPolls() {
+  private async loadVotedPolls() {
     this.isLoading = true;
     this.errorMessage = null;
+    
     try {
-      const response = await axios.get('http://localhost:3000/polls/voted-by-user', {
-        withCredentials: true
-      });
-      
-      this.votedPolls = response.data.map((poll: any) => ({
-        ...poll,
-        expiryDate: new Date(poll.expiryDate).toLocaleDateString(),
-        allowMultiple: poll.userVotes.length > 1,
-        selectedOptions: poll.options.map((opt: PollOption) => 
-          poll.userVotes.some((v: PollOption) => v.id === opt.id)
-        )
-      }));
-      
-      this.totalPages = Math.ceil(this.votedPolls.length / this.pollsPerPage);
+      const response = await this.pollService.getUserVotedPolls();
+      this.processPollData(response.data);
     } catch (error) {
-      console.error('Error fetching voted polls:', error);
-      this.errorMessage = 'Failed to load voted polls. Please try again later.';
+      this.handleLoadError(error);
     } finally {
       this.isLoading = false;
     }
+  }
+
+  private processPollData(polls: any[]) {
+    this.votedPolls = polls.map(poll => ({
+      ...poll,
+      expiryDate: new Date(poll.expiryDate).toLocaleDateString(),
+      allowMultiple: poll.userVotes.length > 1,
+      selectedOptions: poll.options.map((opt: PollOption) => 
+        poll.userVotes.some((v: PollOption) => v.id === opt.id)
+    )}));
+    
+    this.totalPages = Math.ceil(this.votedPolls.length / this.pollsPerPage);
+  }
+
+  private handleLoadError(error: any) {
+    console.error('Error fetching voted polls:', error);
+    this.errorMessage = 'Failed to load voted polls. Please try again later.';
+  }
+
+  // Add this method to fix the template error
+  isUserVoted(option: PollOption, userVotes: PollOption[]): boolean {
+    return userVotes.some(vote => vote.id === option.id);
   }
 
   toggleEditMode(pollId: number) {
@@ -71,14 +83,12 @@ export class UserVotedPollsComponent implements OnInit {
   }
 
   toggleOptionSelection(poll: VotedPoll, index: number) {
+    if (!poll.selectedOptions) return;
+
     if (poll.allowMultiple) {
-      poll.selectedOptions![index] = !poll.selectedOptions![index];
+      poll.selectedOptions[index] = !poll.selectedOptions[index];
     } else {
-      if (poll.selectedOptions![index]) {
-        poll.selectedOptions = poll.selectedOptions!.map(() => false);
-      } else {
-        poll.selectedOptions = poll.selectedOptions!.map((_, i) => i === index);
-      }
+      poll.selectedOptions = poll.selectedOptions.map((_, i) => i === index);
     }
   }
 
@@ -86,27 +96,11 @@ export class UserVotedPollsComponent implements OnInit {
     if (!confirm('Are you sure you want to delete your vote?')) return;
   
     try {
-      const response = await axios.delete(`http://localhost:3000/polls/${pollId}/vote`, {
-        withCredentials: true
-      });
-  
-      alert(response.data.msg || "Vote deleted successfully");
-      this.fetchUserVotedPolls();
+      await this.pollService.deleteVote(pollId);
+      alert('Vote deleted successfully');
+      await this.loadVotedPolls();
     } catch (error: any) {
-      console.error('Error deleting vote:', error);
-  
-      if (error.response) {
-        const { status, data } = error.response;
-        if (status === 400) {
-          alert(data.msg.message || "Bad Request: Invalid Poll ID or Email");
-        } else if (status === 500) {
-          alert("Internal Server Error. Please try again later.");
-        } else {
-          alert(data.msg.message || "An error occurred while deleting the vote.");
-        }
-      } else {
-        alert("Network error. Please check your connection.");
-      }
+      this.handleVoteError(error, 'deleting');
     }
   }
 
@@ -117,94 +111,87 @@ export class UserVotedPollsComponent implements OnInit {
     }
   
     try {
-      const optionIds = poll.options
-        .filter((_, index) => poll.selectedOptions?.[index])
-        .map(opt => opt.id);
-  
-      const requestData = {
-        pollId: poll._id,
-        optionIds: optionIds
-      };
-  
-      const response = await axios.put(`http://localhost:3000/polls/changeVote`, requestData, {
-        withCredentials: true
-      });
-  
-      if (response.data.message === "Vote changed successfully.") {
-        alert('Vote changed successfully!');
-        this.editingPollId = null;
-        this.fetchUserVotedPolls();
-      } else {
-        alert(response.data.message || "Unexpected response from server.");
-      }
+      const optionIds = this.getSelectedOptionIds(poll);
+      await this.pollService.changeVote({ pollId: poll._id, optionIds });
+      
+      alert('Vote changed successfully!');
+      this.editingPollId = null;
+      await this.loadVotedPolls();
     } catch (error: any) {
-      console.error('Error changing vote:', error.response?.data || error.message);
-  
-      if (error.response) {
-        alert(error.response.data?.message || "An error occurred while changing the vote.");
-      } else {
-        alert("An unexpected error occurred. Please try again later.");
-      }
+      this.handleVoteError(error, 'changing');
     }
   }
 
-  get displayedPolls(): VotedPoll[] {
-    const startIndex = (this.currentPage - 1) * this.pollsPerPage;
-    const endIndex = startIndex + this.pollsPerPage;
-    return this.votedPolls.slice(startIndex, endIndex);
+  private getSelectedOptionIds(poll: VotedPoll): number[] {
+    return poll.options
+      .filter((_, index) => poll.selectedOptions?.[index])
+      .map(opt => opt.id);
   }
 
-  isUserVoted(option: PollOption, userVotes: PollOption[]): boolean {
-    return userVotes.some(vote => vote.id === option.id);
+  private handleVoteError(error: any, action: string) {
+    console.error(`Error ${action} vote:`, error);
+    
+    const message = error.response?.data?.message || 
+                   error.message || 
+                   `An error occurred while ${action} the vote.`;
+    
+    alert(message);
+  }
+
+  // Pagination methods
+  get displayedPolls(): VotedPoll[] {
+    const startIndex = (this.currentPage - 1) * this.pollsPerPage;
+    return this.votedPolls.slice(startIndex, startIndex + this.pollsPerPage);
   }
 
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      window.scrollTo(0, 0);
+      this.scrollToTop();
     }
   }
 
   prevPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
-      window.scrollTo(0, 0);
+      this.scrollToTop();
     }
   }
 
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      window.scrollTo(0, 0);
+      this.scrollToTop();
     }
+  }
+
+  private scrollToTop() {
+    window.scrollTo(0, 0);
   }
 
   getPageRange(): number[] {
-    const range = [];
     const maxVisible = 5;
+    const range: number[] = [];
     
     if (this.totalPages <= maxVisible) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        range.push(i);
-      }
-    } else {
-      const start = Math.max(1, this.currentPage - 2);
-      const end = Math.min(this.totalPages, this.currentPage + 2);
-      
-      if (start > 1) range.push(1);
-      if (start > 2) range.push(-1);
-      
-      for (let i = start; i <= end; i++) {
-        range.push(i);
-      }
-      
-      if (end < this.totalPages - 1) range.push(-1);
-      if (end < this.totalPages) range.push(this.totalPages);
+      return Array.from({ length: this.totalPages }, (_, i) => i + 1);
     }
+
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(this.totalPages, this.currentPage + 2);
+
+    if (start > 1) range.push(1);
+    if (start > 2) range.push(-1); // Ellipsis marker
     
+    for (let i = start; i <= end; i++) range.push(i);
+    
+    if (end < this.totalPages - 1) range.push(-1);
+    if (end < this.totalPages) range.push(this.totalPages);
+
     return range;
   }
 
+  // TrackBy functions
   trackByPollId(index: number, poll: VotedPoll): number {
     return poll._id;
   }

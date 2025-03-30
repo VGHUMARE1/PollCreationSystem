@@ -11,11 +11,5 @@ import { RouterModule } from '@angular/router';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
-  // constructor( private router: Router ) { 
-    
-  //      this.router.navigate([`/home/new-poll`]);
-  //   }
-    
-}
+export class HomeComponent {}
 

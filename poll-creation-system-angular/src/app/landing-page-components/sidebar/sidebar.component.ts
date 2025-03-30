@@ -4,6 +4,7 @@ import axios from 'axios';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { ProfileService } from './../../services/profile.service';
 
 interface UserProfile {
   email: string;
@@ -24,7 +25,7 @@ export class SidebarComponent implements OnInit {
   profileError: string | null = null;
   userProfile: UserProfile | null = null;
 
-  constructor( private authService: AuthService,private router: Router) {
+  constructor( private authService: AuthService,private profileService: ProfileService,private router: Router) {
 
   }
 
@@ -41,15 +42,13 @@ export class SidebarComponent implements OnInit {
     this.profileError = null;
     
     try {
-      const response = await axios.get('http://localhost:3000/profile', { 
-        withCredentials: true 
-      });
-      
+      const response = await this.profileService.getUserProfile();
+      // console.log(response);
       this.userProfile = {
-        email: response.data.user.email,
-        first_name: response.data.user.first_name || '',
-        last_name: response.data.user.last_name || '',
-        phone_no: response.data.user.phone_no || null
+        email: response.email,
+        first_name: response.first_name || '',
+        last_name: response.last_name || '',
+        phone_no: response.phone_no || null
       };
       
     } catch (error) {

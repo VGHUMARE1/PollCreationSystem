@@ -1,9 +1,9 @@
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import axios from 'axios';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PollService } from '../../services/poll.service';
 
 @Component({
   selector: 'app-edit-poll',
@@ -28,7 +28,8 @@ export class EditPollComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
-    public router: Router
+    public router: Router,
+    private pollService: PollService
   ) {
     this.initializeForms();
   }
@@ -59,14 +60,10 @@ export class EditPollComponent implements OnInit {
 
   async fetchPollData() {
     try {
-      const response = await axios.get(
-        `http://localhost:3000/polls/${this.pollId}`,
-        { withCredentials: true }
-      );
+      const response = await this.pollService.getPoll(this.pollId);
       this.pollData = response.data;
       this.totalVotes = this.pollData.voters?.length || 0;
       this.populateAllFormFields();
-     
     } catch (error) {
       console.error('Error fetching poll:', error);
       alert('Failed to load poll data. Please try again.');
@@ -145,10 +142,7 @@ export class EditPollComponent implements OnInit {
         options,
       };
       
-      const response = await axios.put(`http://localhost:3000/polls/update`, data, {
-        withCredentials: true,
-      });
-      
+      await this.pollService.updatePollDetails(data);
       alert('Poll details updated successfully!');
       this.pollData.question = question;
     } catch (error) {
@@ -176,23 +170,18 @@ export class EditPollComponent implements OnInit {
         ':' + String(date.getMinutes()).padStart(2, '0') +
         ':00.000000';
   
-      const response = await axios.put(
-        `http://localhost:3000/polls/expiry/${this.pollId}`,
-       { expiryDateTime:expiryDateTime},
-        { withCredentials: true }
-      );
-  
-      console.log("Expiry Date Updated:", response.data);
+      await this.pollService.updateExpiryDate(this.pollId, expiryDateTime);
       this.originalExpiryDate = expiryDateTime;
       this.pollData.expiryDateTime = expiryDateTime;
       alert(`Expiry date updated successfully for Poll ID: ${this.pollId}`);
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error updating expiry date:", error.response?.data || error.message);
       alert(error.response?.data?.message || "Failed to update expiry date. Please try again.");
     } finally {
       this.savingExpiry = false;
     }
   }
+
   hasExpiryChanged(): boolean {
     if (!this.originalExpiryDate) return false;
     const newDate = new Date(this.expiryForm.value.expiryDateTime);

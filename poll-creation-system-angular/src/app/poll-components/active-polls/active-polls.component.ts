@@ -1,25 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import axios from 'axios';
 import { Router } from '@angular/router';
-
-interface Option {
-  id: number;
-  optionText: string;
-}
-
-interface Poll {
-  _id: string;
-  question: string;
-  options: Option[];
-  allowMultiple: boolean;
-  selectedOptions?: boolean[];
-  selectedOption?: number; // Now stores the selected option ID
-  createdBy: string;
-  expiryDate: string;
-  totalVotes: number;
-}
+import { PollService } from '../../services/poll.service';
+import { Poll, Option } from '../../model/poll.model';
 
 @Component({
   selector: 'app-active-polls',
@@ -34,35 +18,38 @@ export class ActivePollsComponent implements OnInit {
   currentPage: number = 1;
   pollsPerPage: number = 4;
   totalPages: number = 1;
+  isLoading: boolean = false;
+  errorMessage: string | null = null;
   
-constructor(private router: Router) {}
-  ngOnInit() {
-    this.fetchActivePolls();
+  constructor(private router: Router, private pollService: PollService) {}
+
+  async ngOnInit(): Promise<void> {
+    await this.fetchActivePolls();
   }
 
-  async fetchActivePolls() {
+  async fetchActivePolls(): Promise<void> {
+    this.isLoading = true;
+    this.errorMessage = null;
+    
     try {
-      const response = await axios.get('http://localhost:3000/polls/active', { withCredentials: true });
-      this.allPolls = response.data.map((poll: Poll) => ({
-        ...poll,
-        selectedOptions: poll.allowMultiple ? new Array(poll.options.length).fill(false) : [],
-        selectedOption: poll.allowMultiple ? null : poll.options[0]?.id, // Set to first option's ID if single choice
-        expiryDate: new Date(poll.expiryDate).toLocaleDateString()
-      }));
+      this.allPolls = await this.pollService.getActivePolls();
       this.totalPages = Math.ceil(this.allPolls.length / this.pollsPerPage);
       this.updateDisplayedPolls();
     } catch (error) {
       console.error('Error fetching active polls:', error);
+      this.errorMessage = 'Failed to load polls. Please try again later.';
+    } finally {
+      this.isLoading = false;
     }
   }
 
-  updateDisplayedPolls() {
+  private updateDisplayedPolls(): void {
     const startIndex = (this.currentPage - 1) * this.pollsPerPage;
     const endIndex = startIndex + this.pollsPerPage;
     this.displayedPolls = this.allPolls.slice(startIndex, endIndex);
   }
 
-  nextPage() {
+  nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.updateDisplayedPolls();
@@ -70,7 +57,7 @@ constructor(private router: Router) {}
     }
   }
 
-  prevPage() {
+  prevPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.updateDisplayedPolls();
@@ -78,7 +65,7 @@ constructor(private router: Router) {}
     }
   }
 
-  goToPage(page: number) {
+  goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updateDisplayedPolls();
@@ -87,7 +74,7 @@ constructor(private router: Router) {}
   }
 
   getPageRange(): number[] {
-    const range = [];
+    const range: number[] = [];
     const maxVisible = 5;
     
     if (this.totalPages <= maxVisible) {
@@ -99,39 +86,63 @@ constructor(private router: Router) {}
       const end = Math.min(this.totalPages, this.currentPage + 2);
       
       if (start > 1) range.push(1);
-      if (start > 2) range.push(-1);
+      if (start > 2) range.push(-1); // Ellipsis indicator
       
       for (let i = start; i <= end; i++) {
         range.push(i);
       }
       
-      if (end < this.totalPages - 1) range.push(-1);
+      if (end < this.totalPages - 1) range.push(-1); // Ellipsis indicator
       if (end < this.totalPages) range.push(this.totalPages);
     }
     
     return range;
   }
 
-  async vote(poll: Poll) {
-    try {
-      const payload = {
-        pollId: poll._id,
-        optionIds: poll.allowMultiple
-          ? poll.options
-              .filter((_, index) => poll.selectedOptions![index])
-              .map(option => option.id)
-          : [poll.selectedOption]
-      };
-  
-      const response = await axios.post('http://localhost:3000/polls/vote', payload, { withCredentials: true });
-      // console.log("Vote Successful:", response.data);
-      alert(response.data.message);
-      this.router.navigate(['/home/voted-polls']);
-      this.fetchActivePolls();
-    } catch (error:any) {
-     
-      alert(error.response?.data?.message || "An error occurred while submitting your vote.");
+  async vote(poll: Poll): Promise<void> {
+    if (!this.validateVote(poll)) {
+      return;
     }
+
+    try {
+      const optionIds = this.getSelectedOptionIds(poll);
+      const response = await this.pollService.submitVote(poll._id, optionIds);
+      alert(response.message);
+      this.router.navigate(['/home/voted-polls']);
+      await this.fetchActivePolls();
+    } catch (error: any) {
+      this.handleVoteError(error);
+    }
+  }
+
+  private validateVote(poll: Poll): boolean {
+    if (poll.allowMultiple) {
+      const selectedCount = poll.selectedOptions?.filter(Boolean).length || 0;
+      if (selectedCount === 0) {
+        alert('Please select at least one option');
+        return false;
+      }
+    } else if (poll.selectedOption === null || poll.selectedOption === undefined) {
+      alert('Please select an option');
+      return false;
+    }
+    return true;
+  }
+
+  private getSelectedOptionIds(poll: Poll): number[] {
+    return poll.allowMultiple
+      ? poll.options
+          .filter((_, index) => poll.selectedOptions?.[index])
+          .map(option => option.id)
+      : [poll.selectedOption!];
+  }
+
+  private handleVoteError(error: any): void {
+    console.error('Error submitting vote:', error);
+    const message = error.response?.data?.message 
+      || error.message 
+      || "An error occurred while submitting your vote.";
+    alert(message);
   }
 
   trackByOption(index: number, option: Option): number {

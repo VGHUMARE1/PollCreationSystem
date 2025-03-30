@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import axios from 'axios';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { PollService } from '../../services/poll.service';
 
 @Component({
   selector: 'app-my-polls',
@@ -17,15 +17,18 @@ export class MyPollsComponent implements OnInit {
   currentPage: number = 1;
   pollsPerPage: number = 2;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private pollService: PollService
+  ) {}
 
-  ngOnInit() {
-    this.fetchMyPolls();
+  async ngOnInit() {
+    await this.fetchMyPolls();
   }
 
   async fetchMyPolls() {
     try {
-      const response = await axios.get(`http://localhost:3000/polls/user/${this.userId}`, { withCredentials: true });
+      const response = await this.pollService.getUserPolls(this.userId);
       this.myPolls = response.data;
     } catch (error) {
       console.error('Error fetching polls:', error);
@@ -36,9 +39,6 @@ export class MyPollsComponent implements OnInit {
   createNewPoll() {
     this.router.navigate(['/home/new-poll']);
   }
-
-  // ... rest of your existing methods ...
-
 
   getVotePercentage(votes: number, totalVotes: number): number {
     return totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
@@ -62,7 +62,11 @@ export class MyPollsComponent implements OnInit {
   }
 
   viewPollAnalysis(pollId: number) {
-    console.log(`Viewing results for poll ID: ${pollId}`);
     this.router.navigate([`/home/poll-analysis/${pollId}`]);
+  }
+
+  
+  trackByPollId(index: number, poll: any): number {
+    return poll.id;
   }
 }

@@ -8,6 +8,4 @@ import { PollFormComponent } from '../../poll-components/poll-form/poll-form.com
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
 })
-export class LandingPageComponent {
-
-}
+export class LandingPageComponent {}

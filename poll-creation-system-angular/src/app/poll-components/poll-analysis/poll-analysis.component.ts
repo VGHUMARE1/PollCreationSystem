@@ -2,12 +2,14 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { ScaleType } from '@swimlane/ngx-charts';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import axios from 'axios';
 import { Color } from '@swimlane/ngx-charts';
+import { PollService } from '../../services/poll.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-poll-analysis',
-  imports: [NgxChartsModule],
+  standalone: true,
+  imports: [NgxChartsModule, CommonModule],
   templateUrl: './poll-analysis.component.html',
   styleUrls: ['./poll-analysis.component.css']
 })
@@ -17,8 +19,10 @@ export class PollAnalysisComponent implements OnInit {
   voters: any[] = [];
   pollCreator: any = {};
 
-  // Pie Chart Configuration
+  // Chart Configurations
   pieChartData: any[] = [];
+  barChartData: any[] = [];
+  
   pieChartColorScheme: Color = {
     domain: [],
     name: '',
@@ -26,8 +30,6 @@ export class PollAnalysisComponent implements OnInit {
     group: ScaleType.Time
   };
 
-  // Bar Chart Configuration
-  barChartData: any[] = [];
   barChartColorScheme: Color = {
     domain: [],
     name: '',
@@ -35,85 +37,75 @@ export class PollAnalysisComponent implements OnInit {
     group: ScaleType.Time
   };
 
-  // Predefined color palette
   private colorPalette: string[] = [
     '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
     '#FF9F40', '#E7E9ED', '#8C564B', '#17BECF', '#BCBD22'
   ];
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private pollService: PollService
+  ) {}
 
   ngOnInit() {
     this.pollId = Number(this.route.snapshot.paramMap.get('id'));
     if (this.pollId) {
-      this.fetchPollDetails();
+      this.loadPollData();
     } else {
-      console.error('Invalid poll ID.');
       this.router.navigate(['/home/my-polls']);
     }
   }
 
-  async fetchPollDetails() {
+  async loadPollData() {
     try {
-      const response = await axios.get(`http://localhost:3000/polls/${this.pollId}`,{ withCredentials: true });
+      const response = await this.pollService.getPollDetails(this.pollId);
       this.poll = response.data;
       this.voters = this.poll?.voters || [];
       this.pollCreator = this.poll?.creator || {};
-
-      if (this.poll?.options) {
-        // Prepare Pie Chart Data
-        this.pieChartData = this.poll.options.map((opt: any, index: number) => ({
-          name: opt.optionText,
-          value: opt.votes
-        }));
-
-        // Prepare Bar Chart Data
-        this.barChartData = this.poll.options.map((opt: any, index: number) => ({
-          name: opt.optionText,
-          value: opt.votes
-        }));
-
-        // Dynamically generate color scheme
-        const colors = this.generateColorScheme(this.poll.options.length);
-        this.pieChartColorScheme.domain = colors;
-        this.barChartColorScheme.domain = colors;
-      }
+      this.initializeCharts();
     } catch (error) {
-      console.error('Error fetching poll details:', error);
-      alert('Failed to fetch poll details. Please try again.');
+      console.error('Error loading poll data:', error);
+      this.router.navigate(['/home/my-polls']);
     }
   }
 
-  // Generate a color scheme dynamically
+  private initializeCharts() {
+    if (!this.poll?.options) return;
+
+    this.pieChartData = this.poll.options.map((opt: any) => ({
+      name: opt.optionText,
+      value: opt.votes
+    }));
+
+    this.barChartData = [...this.pieChartData]; // Same data for both charts
+
+    const colors = this.generateColorScheme(this.poll.options.length);
+    this.pieChartColorScheme.domain = colors;
+    this.barChartColorScheme.domain = colors;
+  }
+
   private generateColorScheme(numColors: number): string[] {
-    const colors: string[] = [];
-    for (let i = 0; i < numColors; i++) {
-      // Use predefined palette or generate random colors
-      colors.push(this.colorPalette[i % this.colorPalette.length] || this.getRandomColor());
-    }
-    return colors;
+    return Array.from({ length: numColors }, (_, i) => 
+      this.colorPalette[i % this.colorPalette.length] || this.getRandomColor()
+    );
   }
 
-  // Generate a random color
   private getRandomColor(): string {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+    return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
   }
 
   async deletePoll() {
     if (!confirm('Are you sure you want to delete this poll?')) return;
 
     try {
-      await axios.delete(`http://localhost:3000/polls/${this.pollId}`,{ withCredentials: true });
-      alert('Poll deleted successfully!');
-      this.router.navigate(['/home/my-polls']);
+      await this.pollService.deletePoll(this.pollId);
+      this.router.navigate(['/home/my-polls'], {
+        state: { message: 'Poll deleted successfully!' }
+      });
     } catch (error) {
       console.error('Error deleting poll:', error);
-      alert('Failed to delete the poll. Please try again.');
+      alert('Failed to delete poll. Please try again.');
     }
   }
 
@@ -121,14 +113,14 @@ export class PollAnalysisComponent implements OnInit {
     if (!this.poll) return;
 
     const newStatus = this.poll.status === 'active' ? 'stopped' : 'active';
-    if (!confirm(`Are you sure you want to ${newStatus} this poll?`)) return;
+    if (!confirm(`Change poll status to ${newStatus}?`)) return;
 
     try {
-      await axios.put(`http://localhost:3000/polls/${this.pollId}/status`, { status: newStatus },{ withCredentials: true });
+      await this.pollService.updatePollStatus(this.pollId, newStatus);
       this.poll.status = newStatus;
     } catch (error) {
-      console.error('Error updating poll status:', error);
-      alert('Failed to update poll status. Please try again.');
+      console.error('Error updating status:', error);
+      alert('Failed to update poll status.');
     }
   }
 
@@ -137,7 +129,7 @@ export class PollAnalysisComponent implements OnInit {
   }
 
   getVotedOptionText(votedOptionId: number): string {
-    const option = this.poll?.options.find((opt: { id: number; }) => opt.id === votedOptionId);
-    return option ? option.optionText : 'N/A';
+    const option = this.poll?.options.find((opt: any) => opt.id === votedOptionId);
+    return option?.optionText || 'Unknown option';
   }
 }

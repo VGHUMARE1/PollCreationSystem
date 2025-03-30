@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import axios from 'axios';
+import { PollService } from '../../services/poll.service';
 
 @Component({
   selector: 'app-poll-form',
@@ -15,28 +15,31 @@ import axios from 'axios';
 export class PollFormComponent implements OnInit {
   pollQuestion: string = '';
   allowMultiple: boolean = false;
-  pollOptions: { value: string }[] = [{ value: '' }, { value: '' }]; // Minimum 2 options
-  expiryDateTime: string = ''; // Store expiry date and time
-  minDateTime!: string; // Store minimum datetime for expiry field
+  pollOptions: { value: string }[] = [{ value: '' }, { value: '' }];
+  expiryDateTime: string = '';
+  minDateTime!: string;
+  isSubmitting: boolean = false;
 
   constructor(
-    private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private pollService: PollService
   ) {}
 
   ngOnInit() {
-    this.setMinDateTime(); // Set minimum selectable datetime
+    this.setMinDateTime();
   }
 
   setMinDateTime() {
     const now = new Date();
-    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Adjust for timezone
-    this.minDateTime = now.toISOString().slice(0, 16); // Format as "YYYY-MM-DDTHH:MM"
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    this.minDateTime = now.toISOString().slice(0, 16);
   }
 
   addOption() {
-    this.pollOptions = [...this.pollOptions, { value: '' }];
+    if (this.pollOptions.length < 10) {
+      this.pollOptions = [...this.pollOptions, { value: '' }];
+    }
   }
 
   removeOption(index: number) {
@@ -46,53 +49,78 @@ export class PollFormComponent implements OnInit {
   }
 
   async submitPoll() {
-    this.pollQuestion = this.pollQuestion.trim();
-    const validOptions = this.pollOptions
-      .map(option => option.value.trim())
-      .filter(option => option.length > 0);
-
-    if (!this.pollQuestion) {
-      alert('Poll question is required.');
-      return;
-    }
-
-    if (validOptions.length < 2) {
-      alert('Please provide at least two valid options.');
-      return;
-    }
-
-    if (!this.expiryDateTime) {
-      alert('Please select an expiry date and time.');
-      return;
-    }
-
-    if (new Date(this.expiryDateTime) < new Date()) {
-      alert('Expiry date cannot be in the past!');
-      return;
-    }
-
-    if (!this.authService.isLoggedIn()) {
-      alert('You must be logged in.');
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    const pollData = {
-      question: this.pollQuestion,
-      options: validOptions,
-      allowMultiple: this.allowMultiple,
-      expiryDateTime: new Date(this.expiryDateTime).toISOString(),
-      createdAt: new Date().toISOString(),
-    };
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
 
     try {
-      await axios.post('http://localhost:3000/polls', pollData, { withCredentials: true });
-      alert('Poll successfully created');
-      this.router.navigate(['/home/my-polls']);
-    } catch (error : any) {
-      console.error('Error creating poll:', error);
-      alert(error.response?.data?.message || 'Failed to create poll. Please try again.');
+      // Validate inputs
+      this.validateInputs();
+
+      // Prepare data
+      const pollData = this.preparePollData();
+
+      // Submit to API
+      await this.pollService.createPoll(pollData);
+      
+      // On success
+      this.handleSuccess();
+    } catch (error: any) {
+      this.handleError(error);
+    } finally {
+      this.isSubmitting = false;
     }
   }
 
+  private validateInputs() {
+    this.pollQuestion = this.pollQuestion.trim();
+    const validOptions = this.getValidOptions();
+
+    if (!this.pollQuestion) {
+      throw new Error('Poll question is required.');
+    }
+
+    if (validOptions.length < 2) {
+      throw new Error('Please provide at least two valid options.');
+    }
+
+    if (!this.expiryDateTime) {
+      throw new Error('Please select an expiry date and time.');
+    }
+
+    if (new Date(this.expiryDateTime) < new Date()) {
+      throw new Error('Expiry date cannot be in the past!');
+    }
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      throw new Error('You must be logged in.');
+    }
+  }
+
+  private getValidOptions(): string[] {
+    return this.pollOptions
+      .map(option => option.value.trim())
+      .filter(option => option.length > 0);
+  }
+
+  private preparePollData() {
+    return {
+      question: this.pollQuestion,
+      options: this.getValidOptions(),
+      allowMultiple: this.allowMultiple,
+      expiryDateTime: new Date(this.expiryDateTime).toISOString(),
+      createdAt: new Date().toISOString()
+    };
+  }
+
+  private handleSuccess() {
+    alert('Poll successfully created');
+    this.router.navigate(['/home/my-polls']);
+  }
+
+  private handleError(error: any) {
+    console.error('Error creating poll:', error);
+    const message = error.response?.data?.message || error.message || 'Failed to create poll. Please try again.';
+    alert(message);
+  }
 }
