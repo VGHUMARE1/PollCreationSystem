@@ -86,27 +86,39 @@ module.exports.getPollById=async (req, res) => {
 }
 
 
-module.exports.giveVote=async (req, res) => {
+module.exports.giveVote = async (req, res) => {
   req.body.voterEmail = req.user.email;
-  console.log(req.body);
+  console.log("Request Body:", req.body);
+
   try {
-    const result = await axios.post(
+    const response = await axios.post(
       `${process.env.APIURL}/polls/vote`,
       req.body
     );
 
-    console.log(result);
+    console.log("Response Data:", response.data);
 
-    // Send success response with status 200
-    res.status(200).json(result.data.message);
+    return res.status(200).json({
+      voteIds: response.data.voteIds,
+      message: response.data.message,
+    });
   } catch (error) {
-    console.error(error);
-
-    // Send proper error response with status 500
-    res.status(500).json({ msg: error.message || "Internal Server Error" });
+    console.error("Error Response:", error.response?.data || error.message);
+    
+    if (error.response) {
+      return res.status(error.response.status).json({
+        voteIds: error.response.data.voteIds,
+        message: error.response.data.message,
+      });
+    }
+    
+    return res.status(500).json({
+      voteIds: null,
+      message: "Internal Server Error",
+    });
   }
-  // res.json({ message: req.body.selectedOptions });
-}
+};
+
 
 
 module.exports.deleteVote= async (req, res) => {
@@ -163,7 +175,7 @@ module.exports.updatePoll=async (req, res) => {
     }
 
     // Forward the request to Spring Boot API
-    const response = await axios.put("http://172.16.16.11:8080/polls/update", {
+    const response = await axios.put(`${process.env.APIURL}/polls/update`, {
       pollId,
       question,
       allowMultipleSelect,
@@ -236,30 +248,40 @@ module.exports.changeVote=async (req, res) => {
 
 
 
-module.exports.changeExpiryDate=async (req, res) => {
+module.exports.changeExpiryDate = async (req, res) => {
   try {
     const { pollId } = req.params;
     const { expiryDateTime } = req.body;
 
     if (!expiryDateTime) {
-      return res.status(400).json({ msg: "Expiry date is required" });
+      return res.status(400).json({ message: "Expiry date is required" });
     }
-
-    console.log(`Updating expiry for poll ${pollId} to ${expiryDateTime}`);
 
     const response = await axios.put(
       `${process.env.APIURL}/polls/expiry/${pollId}?newExpiryDate=${expiryDateTime}`
     );
-    console.log(response);
-    res
-      .status(200)
-      .json({ msg: "Expiry updated successfully", data: response.data });
-  } catch (error) {
-    console.error("Error updating expiry date:", error.message);
-    res.status(500).json({ msg: "Internal Server Error" });
-  }
-}
 
+    console.log("Response Data:", response.data);
+    return res.status(200).json({
+      message: `Expiry date updated successfully for Poll ID: ${pollId}`,
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("Error updating expiry date:", error.response?.data || error.message);
+    
+    if (error.response) {
+      return res.status(error.response.status).json({
+        message: error.response.data.message || "An unexpected error occurred",
+        data: null,
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal Server Error",
+      data: null,
+    });
+  }
+};
 
 
 module.exports.changeStatusOfPoll=async (req, res) => {

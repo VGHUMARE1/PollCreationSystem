@@ -40,7 +40,7 @@ module.exports.register=async (req, res) => {
   module.exports.login= (req, res, next) => {
     const { email, password } = req.body;
     
-    const secretKey = 'your-secret-key';
+    const secretKey =  'topSecret';
   
     const decryptedEmail = decryptData(email, secretKey);
     const decryptedPassword = decryptData(password, secretKey);
