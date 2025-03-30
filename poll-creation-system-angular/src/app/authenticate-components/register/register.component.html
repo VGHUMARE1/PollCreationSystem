@@ -60,6 +60,48 @@
         <div class="error" *ngIf="emailExists">
           Email already exists! <a routerLink="/login">Try logging in?</a>
         </div>
+        
+        <!-- OTP Section -->
+        <div class="otp-section" *ngIf="!emailVerified && registerForm.get('email')?.valid && !emailExists">
+          <button type="button" class="otp-btn" 
+                  (click)="sendEmailOTP()" 
+                  [disabled]="isSendingOTP || otpResendTimer > 0">
+            <span *ngIf="!isSendingOTP">
+              {{ otpResendTimer > 0 ? ('Resend OTP in ' + otpResendTimer + 's') : 'Send OTP' }}
+            </span>
+            <span *ngIf="isSendingOTP">Sending OTP...</span>
+          </button>
+          <span class="otp-sent" *ngIf="emailOTPSent && !emailVerified">
+            OTP sent successfully!
+          </span>
+        </div>
+    
+        <div class="otp-verify" *ngIf="emailOTPSent && !emailVerified">
+          <input 
+            type="text" 
+            placeholder="Enter OTP" 
+            formControlName="otp"
+            maxlength="6"
+            class="otp-input"
+            [class.error-highlight]="otpError"
+          />
+          <button type="button" class="verify-btn" 
+                  (click)="verifyEmailOTP()" 
+                  [disabled]="registerForm.get('otp')?.invalid || isVerifyingOTP">
+            <span *ngIf="!isVerifyingOTP">Verify</span>
+            <span *ngIf="isVerifyingOTP">Verifying...</span>
+          </button>
+          <div class="attempts" *ngIf="otpAttempts > 0">
+            Attempts: {{otpAttempts}}/{{maxOtpAttempts}}
+          </div>
+          <div class="error" *ngIf="otpError">
+            {{ otpError }}
+          </div>
+        </div>
+        
+        <div class="success" *ngIf="emailVerified">
+          Email verified successfully!
+        </div>
       </div>
 
       <div class="form-group">
@@ -88,14 +130,19 @@
 
       <div class="form-group">
         <label for="confirmPassword">Confirm Password</label>
-        <input 
-          id="confirmPassword" 
-          [type]="showConfirmPassword ? 'text' : 'password'" 
-          placeholder="Confirm your password" 
-          formControlName="confirmPassword"
-          [class.invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched"
-          autocomplete="new-password"
-        />
+        <div class="password-container">
+          <input 
+            id="confirmPassword" 
+            [type]="showConfirmPassword ? 'text' : 'password'" 
+            placeholder="Confirm your password" 
+            formControlName="confirmPassword"
+            [class.invalid]="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched"
+            autocomplete="new-password"
+          />
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility('confirmPassword')">
+            {{ showConfirmPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
         <div class="error" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched">
           Passwords do not match
         </div>
@@ -127,13 +174,13 @@
         </div>
       </div>
 
-      <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || emailExists || isSubmitting">
+      <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || emailExists || !emailVerified || isSubmitting">
         <span *ngIf="!isSubmitting">Create Account</span>
         <span *ngIf="isSubmitting">Creating account...</span>
       </button>
 
       <div class="login-link">
-        Already have an account? <a routerLink="/login">Sign in</a>
+        Already have an account? <a href="/login">Sign in</a>
       </div>
     </form>
 
@@ -141,4 +188,4 @@
       {{ message }}
     </div>
   </div>
-</div>  
+</div>

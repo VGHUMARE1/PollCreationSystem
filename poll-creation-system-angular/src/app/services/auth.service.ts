@@ -2,12 +2,15 @@ import { Injectable } from '@angular/core';
 import axios from 'axios';
 import { CookieService } from 'ngx-cookie-service';
 import * as CryptoJS from 'crypto-js';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private apiUrl = 'http://localhost:3000/auth';
+  private emailApiUrl = 'http://localhost:8080/email/send';
+  private otpStorage: {[email: string]: {otp: string, expiry: Date}} = {};
 
   constructor(private cookieService: CookieService) {}
 
@@ -73,4 +76,50 @@ export class AuthService {
       throw error;
     }
   }
+
+
+
+
+
+  async sendEmailOTP(email: string): Promise<any> {
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry
+    
+    // Store OTP for verification
+    this.otpStorage[email] = { otp, expiry };
+    
+    const subject = 'Your OTP for Registration';
+    const message = `Your OTP is: ${otp}. This OTP is valid for 5 minutes.`;
+    
+    try {
+      const response = await axios.post(`${this.apiUrl}/email/send`, { email, subject, message });
+      console.log(`OTP ${otp} sent to ${email}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      throw error;
+    }
+  }
+
+  verifyEmailOTP(email: string, otp: string): Observable<{verified: boolean}> {
+    const storedOtp = this.otpStorage[email];
+    
+    if (!storedOtp) {
+      return of({verified: false});
+    }
+    
+    // Check if OTP matches and isn't expired
+    const verified = storedOtp.otp === otp && new Date() < new Date(storedOtp.expiry);
+    
+    
+    if (verified) {
+      // Clear the OTP after successful verification
+      delete this.otpStorage[email];
+    }
+    
+    // return of({verified});
+    return of({verified});
+  }
+
 }
