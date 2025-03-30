@@ -3,7 +3,7 @@ const axios=require("axios");
 
 const CryptoJS = require("crypto-js");
 
-// Function to decrypt data
+
 function decryptData(encryptedData, secretKey) {
   const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
   return bytes.toString(CryptoJS.enc.Utf8);

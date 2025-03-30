@@ -2,6 +2,7 @@ const CryptoJS = require('crypto-js');
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const User = require("../models/User");
+const axios=require("axios")
 
 function decryptData(encryptedData, secretKey) {
   const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
@@ -93,7 +94,7 @@ module.exports.register=async (req, res) => {
     }
   
     try {
-      const email = req.user.email; // Extract from token/session
+      const email = req.user.email; 
   
       const user = await User.findOne({ where: { email } });
   
@@ -111,5 +112,57 @@ module.exports.register=async (req, res) => {
     } catch (error) {
       console.error('Error updating profile:', error);
       return res.status(500).json({ error: 'Database error' });
+    }
+  }
+
+
+  module.exports.sendEmail=async (req, res) => {
+    try {
+      const { email, subject, message } = req.body;
+      
+      if (!email || !subject || !message) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+    console.log(req.body);
+     
+      const response = await axios.post(`${process.env.APIURL}/email/send`, {
+        email,
+        subject,
+        message
+      });
+  
+      if (response.status === 200) {
+        return res.status(200).json({ 
+          success: true,
+          message: response.data || `Email sent successfully to ${email}`
+        });
+      } else {
+        return res.status(response.status).json({ 
+          error: 'Failed to send email',
+          details: response.data 
+        });
+      }
+    } catch (error) {
+      console.error('Error sending email:', error);
+      
+      if (error.response) {
+       
+        return res.status(error.response.status).json({
+          error: 'Email service error',
+          details: error.response.data
+        });
+      } else if (error.request) {
+       
+        return res.status(503).json({
+          error: 'Email service unavailable',
+          details: 'No response from email service'
+        });
+      } else {
+        
+        return res.status(500).json({
+          error: 'Internal server error',
+          details: error.message
+        });
+      }
     }
   }

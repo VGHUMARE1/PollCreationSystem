@@ -5,6 +5,10 @@ const authControllers=require("../controllers/authController")
 
 const router = express.Router();
 
+
+router.post('/email/send', authControllers.sendEmail);
+
+
 // Check Email Route
 router.post('/check-email',authControllers.checkEmail );
 // Register Route
