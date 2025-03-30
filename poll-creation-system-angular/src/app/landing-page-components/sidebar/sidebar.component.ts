@@ -24,10 +24,16 @@ export class SidebarComponent implements OnInit {
   profileError: string | null = null;
   userProfile: UserProfile | null = null;
 
-  constructor( private authService: AuthService,private router: Router) {}
+  constructor( private authService: AuthService,private router: Router) {
+
+  }
 
   async ngOnInit() {
+    if(!this.authService.isLoggedIn()){
+      this.router.navigate(['/login']);
+    }
     await this.loadUserProfile();
+   
   }
 
   async loadUserProfile() {
