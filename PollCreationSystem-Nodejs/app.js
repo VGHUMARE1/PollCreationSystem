@@ -16,11 +16,11 @@ const app = express();
 // CORS Middleware
 app.use(
   cors({
-    origin: "http://localhost:4200", // Allow frontend access
-    credentials: true, // Allow cookies and authentication headers
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Added OPTIONS for preflight requests
-    allowedHeaders: ["Content-Type", "Authorization"], // Headers that can be sent in requests
-    exposedHeaders: ["Authorization"], // Allows the frontend to access specific headers
+    origin: "http://localhost:4200", 
+    credentials: true, 
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"], 
+    exposedHeaders: ["Authorization"], 
   })
 );
 // Middleware
@@ -49,7 +49,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24, // 1 day
       httpOnly: true,
-      secure: false, // Set `true` in production with HTTPS
+      secure: false, 
     },
   })
 );
@@ -66,6 +66,8 @@ app.use(passport.session());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/polls", pollsRoutes);
+
+
 app.get("/profile", (req, res) => {
   const user={
     first_name:req.user.first_name,

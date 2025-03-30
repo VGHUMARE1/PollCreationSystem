@@ -1,6 +1,4 @@
-const bcrypt = require("bcryptjs");
-const passport = require("passport");
-const User = require("../models/User");
+
 const axios=require("axios");
 
 const CryptoJS = require("crypto-js");
@@ -16,14 +14,11 @@ module.exports.getActivePolls = async (req, res) => {
       `${process.env.APIURL}/polls/active?email=${req.user.email}`
     );
 
-    // console.dir(result.data);
-
-    // Send success response with status 200
+    
     res.status(200).json(result.data);
   } catch (error) {
     console.error(error.message);
 
-    // Send proper error response with status 500
     res.status(500).json({ msg: error.message || "Internal Server Error" });
   }
 };

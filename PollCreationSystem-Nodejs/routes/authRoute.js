@@ -1,4 +1,5 @@
 const express = require("express");
+const { isLoggedIn } = require("../middlewares/authMiddlewares");
 
 const authControllers=require("../controllers/authController")
 
@@ -17,6 +18,6 @@ router.get("/logout", authControllers.logout);
 
 
 // Edit Profile Route
-router.put('/editprofile', authControllers.editProfile);
+router.put('/editprofile',isLoggedIn, authControllers.editProfile);
 
 module.exports = router;

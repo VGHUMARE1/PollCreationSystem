@@ -4,12 +4,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const pollsController=require("../controllers/pollsController");
-const {
-  MyPolls,
-  Poll,
-  ActivePolls,
-  VotedPolls,
-} = require("../utils/staticData");
+
 const { isLoggedIn } = require("../middlewares/authMiddlewares");
 
 router.get("/active", isLoggedIn, pollsController.getActivePolls);
