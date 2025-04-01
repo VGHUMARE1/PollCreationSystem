@@ -36,8 +36,6 @@ export class UserService {
 
   verifyEmailOTP(verificationData: { email: string; otp: string }): Observable<boolean> {
     return new Observable(observer => {
-      // In a real application, you would verify against stored OTP in backend
-      // For this demo, we're verifying against the temporarily stored OTP
       const storedOtp = this.otpStorage[verificationData.email];
       
       if (storedOtp && storedOtp === verificationData.otp) {
@@ -52,11 +50,8 @@ export class UserService {
     });
   }
 
-  // In a production environment, you would implement this on the backend
-  // and make an HTTP call to verify the OTP
   private verifyOtpWithBackend(email: string, otp: string): Observable<boolean> {
-    // This is just a placeholder for what would be your actual backend API call
-    // return this.http.post<boolean>('your-backend-api/verify-otp', { email, otp });
+   
     return new Observable(observer => {
       observer.next(true);
       observer.complete();

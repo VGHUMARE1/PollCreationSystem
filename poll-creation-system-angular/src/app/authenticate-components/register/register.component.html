@@ -85,7 +85,7 @@
               class="otp-input"
               [class.error]="otpError"
             />
-            <button type="button" class="verify-btn" 
+            &nbsp;  &nbsp;  &nbsp;  &nbsp;&nbsp;  &nbsp;  &nbsp;  &nbsp;  <button type="button" class="verify-btn" 
                     (click)="verifyEmailOTP()" 
                     [disabled]="registerForm.get('otp')?.invalid || isVerifyingOTP">
               <span *ngIf="!isVerifyingOTP">Verify</span>

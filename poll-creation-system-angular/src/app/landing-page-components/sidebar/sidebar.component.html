@@ -6,7 +6,7 @@
       </div>
       <div *ngIf="!isCollapsed" class="user-info">
         <h5>{{ (userProfile?.first_name + ' ' + userProfile?.last_name) || userProfile?.email }}</h5>
-        <p *ngIf="userProfile?.phone_no">{{ userProfile?.phone_no }}</p>
+        <!-- <p *ngIf="userProfile?.phone_no">{{ userProfile?.phone_no }}</p> -->
       </div>
       <button class="toggle-btn" (click)="toggleSidebar()">
         <i [class]="isCollapsed ? 'bi bi-list' : 'bi bi-x-lg'"></i>

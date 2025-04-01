@@ -63,7 +63,7 @@ export class PollAnalysisComponent implements OnInit {
     }
   }
 
- 
+ // Add to your component class
 isLoading = true;
 errorLoading = false;
 
@@ -78,7 +78,7 @@ async loadPollData() {
     this.pollCreator = this.poll?.creator || {};
     this.initializeCharts();
   } catch (error) {
-    console.error('Error loading poll data:', error);
+    // console.error('Error loading poll data:', error);
     this.errorLoading = true;
     this.showToast('Failed to load poll data', 'error');
     this.router.navigate(['/home/my-polls']);
@@ -134,14 +134,14 @@ copyPollLink() {
   }
 
   async deletePoll() {
-    if (!confirm('Are you sure you want to delete this poll?')) return;
+    // if (!confirm('Are you sure you want to delete this poll?')) return;
 
     try {
       await this.pollService.deletePoll(this.pollId);
       this.showToast('Poll deleted successfully!', 'success');
       this.router.navigate(['/home/my-polls']);
     } catch (error) {
-      console.error('Error deleting poll:', error);
+      // console.error('Error deleting poll:', error);
       this.showToast('Failed to delete poll. Please try again.', 'error');
     }
   }
@@ -150,14 +150,14 @@ copyPollLink() {
     if (!this.poll) return;
 
     const newStatus = this.poll.status === 'active' ? 'stopped' : 'active';
-    if (!confirm(`Change poll status to ${newStatus}?`)) return;
+    // if (!confirm(`Change poll status to ${newStatus}?`)) return;
 
     try {
       await this.pollService.updatePollStatus(this.pollId, newStatus);
       this.poll.status = newStatus;
       this.showToast(`Poll status changed to ${newStatus}`, 'success');
     } catch (error) {
-      console.error('Error updating status:', error);
+      // console.error('Error updating status:', error);
       this.showToast('Failed to update poll status', 'error');
     }
   }

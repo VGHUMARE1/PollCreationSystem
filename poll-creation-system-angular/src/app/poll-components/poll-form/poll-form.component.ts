@@ -135,7 +135,7 @@ export class PollFormComponent implements OnInit {
   }
 
   private handleError(error: any) {
-    console.error('Error creating poll:', error);
+    // console.error('Error creating poll:', error);
     const message = error.response?.data?.message || error.message || 'Failed to create poll. Please try again.';
     this.showToast(message, 'error');
   }

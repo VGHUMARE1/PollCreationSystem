@@ -47,3 +47,22 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   opacity: 0.9;
   transform: translateY(-1px);
 }
+
+/* Fixed positioning for all snackbars */
+.cdk-overlay-container .mat-snack-bar-container {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 1000 !important;
+}
+
+/* Optional: Add animation */
+.mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+  padding: 12px 20px !important;
+}
+
+

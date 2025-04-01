@@ -31,7 +31,7 @@ interface VotedPoll {
 export class UserVotedPollsComponent implements OnInit {
   votedPolls: VotedPoll[] = [];
   currentPage: number = 1;
-  pollsPerPage: number = 4;
+  pollsPerPage: number = 2;
   totalPages: number = 1;
   editingPollId: number | null = null;
   isLoading: boolean = false;
@@ -70,7 +70,7 @@ export class UserVotedPollsComponent implements OnInit {
   }
 
   private handleLoadError(error: any) {
-    console.error('Error fetching voted polls:', error);
+    // console.error('Error fetching voted polls:', error);
     this.errorMessage = 'Failed to load voted polls. Please try again later.';
   }
 
@@ -94,7 +94,7 @@ export class UserVotedPollsComponent implements OnInit {
   }
 
   async deleteVote(pollId: number) {
-    if (!confirm('Are you sure you want to delete your vote?')) return;
+    // if (!confirm('Are you sure you want to delete your vote?')) return;
   
     try {
       await this.pollService.deleteVote(pollId);

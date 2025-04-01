@@ -17,7 +17,7 @@ export class PollService {
       const response = await axios.get(`${this.apiUrl}/${pollId}`, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.error('Error fetching poll:', error);
+      // console.error('Error fetching poll:', error);
       throw error;
     }
   }
@@ -28,7 +28,7 @@ export class PollService {
       const response = await axios.put(`${this.apiUrl}/${pollId}`, pollData, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.error('Error updating poll:', error);
+      // console.error('Error updating poll:', error);
       throw error;
     }
   }
@@ -43,14 +43,14 @@ export class PollService {
       const response = await axios.get(`${this.apiUrl}/active`, { withCredentials: true });
       return response.data.map((poll: Poll) => this.processPoll(poll));
     } catch (error) {
-      console.error('Error fetching active polls:', error);
+      // console.error('Error fetching active polls:', error);
       throw error;
     }
   }
 
   // Submit a vote
   async submitVote(pollId: string, optionIds: number[]): Promise<{ message: string }> {
-    console.log(pollId)
+    // console.log(pollId)
     try {
       const response = await axios.post(`${this.apiUrl}/vote`, {
         pollId,

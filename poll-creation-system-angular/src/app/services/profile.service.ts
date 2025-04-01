@@ -14,7 +14,7 @@ export class ProfileService {
       const response = await axios.get('http://localhost:3000/profile', { withCredentials: true });
       return response.data.user;
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      // console.error('Error fetching profile:', error);
       throw error;
     }
   }
@@ -33,7 +33,7 @@ export class ProfileService {
     try {
       await axios.put('http://localhost:3000/auth/editprofile', user, { withCredentials: true });
     } catch (error) {
-      console.error('Error updating profile:', error);
+      // console.error('Error updating profile:', error);
       throw error;
     }
   }

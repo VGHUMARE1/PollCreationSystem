@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PollService } from '../../services/poll.service';
+import { ToastrService } from 'ngx-toastr';
 
 interface Voter {
   email: string;
@@ -65,7 +66,8 @@ export class PollComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private pollService: PollService
+    private pollService: PollService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
@@ -79,15 +81,7 @@ export class PollComponent implements OnInit {
     });
   }
 
-  private showToastMessage(message: string, type: 'success' | 'error' | 'warning'): void {
-    this.toastMessage = message;
-    this.toastType = type;
-    this.showToast = true;
-    setTimeout(() => {
-      this.showToast = false;
-    }, 3000);
-  }
-
+ 
   async fetchPoll(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = null;
@@ -104,9 +98,9 @@ export class PollComponent implements OnInit {
           undefined
       };
     } catch (error) {
-      console.error('Poll fetch error:', error);
+      // console.error('Poll fetch error:', error);
       this.errorMessage = 'Failed to load poll. Please try again.';
-      this.showToastMessage('Failed to load poll. Please try again.', 'error');
+      this.toastr.error('Failed to load poll. Please try again.');
     } finally {
       this.isLoading = false;
     }
@@ -119,26 +113,23 @@ export class PollComponent implements OnInit {
       const optionIds = this.getSelectedOptionIds();
       const response = await this.pollService.submitVote(this.pollId, optionIds);
       this.hasVoted = true;
-      this.showToastMessage(response.message || 'Your vote has been submitted successfully!', 'success');
+      this.toastr.success(response.message || 'Your vote has been submitted successfully!', 'success');
       await this.fetchPoll();
       this.router.navigate(['/home/voted-polls']);
     } catch (error: any) {
-      console.error('Vote submission error:', error);
-      this.showToastMessage(
-        error.response?.data?.message || 'Failed to submit vote. Please try again.', 
-        'error'
-      );
+      // console.error('Vote submission error:', error);
+      this.toastr.error( error.response?.data?.message || 'Failed to submit vote. Please try again.');
     }
   }
 
   private validateVote(): boolean {
     if (this.poll.allowMultiple) {
       if (!this.poll.selectedOptions?.some(selected => selected)) {
-        this.showToastMessage('Please select at least one option', 'warning');
+        this.toastr.info('Please select at least one option', 'warning');
         return false;
       }
     } else if (this.poll.selectedOption === undefined) {
-      this.showToastMessage('Please select an option', 'warning');
+      this.toastr.info('Please select an option', 'warning');
       return false;
     }
     return true;

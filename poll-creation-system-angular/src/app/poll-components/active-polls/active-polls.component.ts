@@ -17,7 +17,7 @@ export class ActivePollsComponent implements OnInit {
   allPolls: Poll[] = [];
   displayedPolls: Poll[] = [];
   currentPage: number = 1;
-  pollsPerPage: number = 4;
+  pollsPerPage: number = 2;
   totalPages: number = 1;
   isLoading: boolean = false;
   errorMessage: string | null = null;
@@ -41,7 +41,7 @@ export class ActivePollsComponent implements OnInit {
       this.totalPages = Math.ceil(this.allPolls.length / this.pollsPerPage);
       this.updateDisplayedPolls();
     } catch (error) {
-      console.error('Error fetching active polls:', error);
+      // console.error('Error fetching active polls:', error);
       this.errorMessage = 'Failed to load polls. Please try again later.';
       this.toastr.error('Failed to load polls. Please try again later.', 'Error');
     } finally {
@@ -144,7 +144,7 @@ export class ActivePollsComponent implements OnInit {
   }
 
   private handleVoteError(error: any): void {
-    console.error('Error submitting vote:', error);
+    // console.error('Error submitting vote:', error);
     const message = error.response?.data?.message 
       || error.message 
       || "An error occurred while submitting your vote.";
