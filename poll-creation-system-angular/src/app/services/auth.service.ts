@@ -83,11 +83,10 @@ export class AuthService {
 
 
   async sendEmailOTP(email: string): Promise<any> {
-    // Generate a 6-digit OTP
+   
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry
+    const expiry = new Date(Date.now() + 5 * 60 * 1000); 
     
-    // Store OTP for verification
     this.otpStorage[email] = { otp, expiry };
     
     const subject = 'Your OTP for Registration';
@@ -95,10 +94,10 @@ export class AuthService {
     
     try {
       const response = await axios.post(`${this.apiUrl}/email/send`, { email, subject, message });
-      console.log(`OTP ${otp} sent to ${email}`);
+      // console.log(`OTP ${otp} sent to ${email}`);
       return response.data;
     } catch (error) {
-      console.error('Error sending OTP:', error);
+      // console.error('Error sending OTP:', error);
       throw error;
     }
   }
@@ -110,12 +109,10 @@ export class AuthService {
       return of({verified: false});
     }
     
-    // Check if OTP matches and isn't expired
     const verified = storedOtp.otp === otp && new Date() < new Date(storedOtp.expiry);
     
     
     if (verified) {
-      // Clear the OTP after successful verification
       delete this.otpStorage[email];
     }
     
