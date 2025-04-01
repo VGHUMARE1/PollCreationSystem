@@ -13,7 +13,8 @@ module.exports.getActivePolls = async (req, res) => {
     const result = await axios.get(
       `${process.env.APIURL}/polls/active?email=${req.user.email}`
     );
-
+    console.dir(result.data)
+    console.log(result.data[0].options[0])
     
     res.status(200).json(result.data);
   } catch (error) {
