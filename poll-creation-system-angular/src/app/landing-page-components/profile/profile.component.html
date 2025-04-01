@@ -1,37 +1,76 @@
 <div class="profile-container">
-  <div class="card profile-card">
+    <div class="card profile-card">
       <h2 class="text-center">My Profile</h2>
-
-      <!-- Profile Details -->
-      <div *ngIf="!isEditing">
-          <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
-          <p><strong>Email:</strong> {{ user.email }}</p>
-          <p><strong>Phone:</strong> {{ user.phone_no }}</p>
-
-          <button class="btn btn-primary mt-3 w-100" (click)="toggleEdit()">Edit Profile</button>
+  
+      <!-- Profile View Mode -->
+      <div *ngIf="!isEditing" class="profile-view">
+        <div class="profile-field">
+          <span class="field-label">First Name:</span>
+          <span class="field-value">{{ user.first_name }}</span>
+        </div>
+        <div class="profile-field">
+          <span class="field-label">Last Name:</span>
+          <span class="field-value">{{ user.last_name }}</span>
+        </div>
+        <div class="profile-field">
+          <span class="field-label">Email:</span>
+          <span class="field-value">{{ user.email }}</span>
+        </div>
+        <div class="profile-field">
+          <span class="field-label">Phone:</span>
+          <span class="field-value">{{ user.phone_no }}</span>
+        </div>
+  
+        <button class="btn btn-edit" (click)="toggleEdit()">
+          Edit Profile
+        </button>
       </div>
-
-      <!-- Edit Form -->
-      <form *ngIf="isEditing" (ngSubmit)="updateProfile()">
-          <div class="mb-2">
-              <label>First Name</label>
-              <input type="text" class="form-control" [(ngModel)]="user.first_name" name="first_name" required />
+  
+      <!-- Edit Mode -->
+      <form *ngIf="isEditing" (ngSubmit)="updateProfile()" class="profile-edit-form">
+        <div class="form-group">
+          <label for="first_name">First Name</label>
+          <input type="text" id="first_name" class="form-control" 
+                 [(ngModel)]="user.first_name" name="first_name"
+                 required minlength="2" maxlength="30"
+                 (blur)="validateField('first_name', user.first_name)">
+          <div class="error-message" *ngIf="formErrors.first_name">
+            {{ formErrors.first_name }}
           </div>
-          <div class="mb-2">
-              <label>Last Name</label>
-              <input type="text" class="form-control" [(ngModel)]="user.last_name" name="last_name" required />
+        </div>
+  
+        <div class="form-group">
+          <label for="last_name">Last Name</label>
+          <input type="text" id="last_name" class="form-control"
+                 [(ngModel)]="user.last_name" name="last_name"
+                 required minlength="2" maxlength="30"
+                 (blur)="validateField('last_name', user.last_name)">
+          <div class="error-message" *ngIf="formErrors.last_name">
+            {{ formErrors.last_name }}
           </div>
-          <div class="mb-2">
-              <label>Email</label>
-              <input type="email" class="form-control" [(ngModel)]="user.email" name="email" required disabled />
+        </div>
+  
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" class="form-control"
+                 [(ngModel)]="user.email" name="email" disabled>
+        </div>
+  
+        <div class="form-group">
+          <label for="phone_no">Phone</label>
+          <input type="tel" id="phone_no" class="form-control"
+                 [(ngModel)]="user.phone_no" name="phone_no"
+                 required pattern="\d{10,15}"
+                 (blur)="validateField('phone_no', user.phone_no)">
+          <div class="error-message" *ngIf="formErrors.phone_no">
+            {{ formErrors.phone_no }}
           </div>
-          <div class="mb-2">
-              <label>Phone</label>
-              <input type="text" class="form-control" [(ngModel)]="user.phone_no" name="phone_no" required />
-          </div>
-
-          <button type="submit" class="btn btn-success w-100">Save Changes</button>
-          <button type="button" class="btn btn-danger w-100 mt-2" (click)="toggleEdit()">Cancel</button>
+        </div>
+  
+        <div class="form-actions">
+          <button type="submit" class="btn btn-save">Save Changes</button>
+          <button type="button" class="btn btn-cancel" (click)="toggleEdit()">Cancel</button>
+        </div>
       </form>
+    </div>
   </div>
-</div>

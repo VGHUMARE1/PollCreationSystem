@@ -1,59 +1,180 @@
+:host {
+  --primary-dark: #222831;
+  --secondary-dark: #393E46;
+  --accent: #00ADB5;
+  --light: #EEEEEE;
+  --accent-hover: #008E96;
+  --secondary-hover: #2D3238;
+  --border-color: rgba(57, 62, 70, 0.2);
+  --error: #D32F2F;
+  --disabled-bg: #D3D3D3;
+}
+
 .profile-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background-color: #222831;
-    padding: 20px;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.profile-card {
+  background: var(--light);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  transition: all 0.3s ease;
+}
+
+.profile-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.profile-view .profile-field {
+  margin-bottom: 1.25rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.field-label {
+  font-weight: 700;
+  margin-right: 0.75rem;
+  color: var(--primary-dark);
+  min-width: 120px;
+  font-size: 0.95rem;
+}
+
+.field-value {
+  color: var(--secondary-dark);
+  flex: 1;
+  font-size: 1rem;
+}
+
+.profile-edit-form .form-group {
+  margin-bottom: 1.75rem;
+}
+
+.profile-edit-form label {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  font-size: 0.95rem;
+}
+
+.profile-edit-form .form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: white;
+  transition: border 0.3s ease;
+}
+
+.profile-edit-form .form-control:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(0, 173, 181, 0.2);
+}
+
+.profile-edit-form .form-control:disabled {
+  background-color: var(--disabled-bg);
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message::before {
+  content: "⚠";
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 100px;
+}
+
+.btn-edit {
+  background-color: var(--accent);
+  color: white;
+  margin-top: 1.5rem;
+}
+
+.btn-edit:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-save {
+  background-color: var(--accent);
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn-cancel {
+  background-color: var(--secondary-dark);
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: var(--secondary-hover);
+  transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 1rem 0.5rem;
   }
   
   .profile-card {
-    width: 500px;
-    padding: 30px;
-    background: #393E46;
-    color: #EEEEEE;
-    border-radius: 10px;
-    box-shadow: 0px 5px 15px rgba(0, 173, 181, 0.3);
-    transition: 0.3s;
+    padding: 1.5rem;
   }
   
-  .profile-card h2 {
-    color: #00ADB5;
+  .profile-view .profile-field {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .profile-card input {
-    background: #EEEEEE;
-    border: 1px solid #00ADB5;
-    color: #222831;
-    transition: 0.3s;
+  .field-label {
+    margin-bottom: 0.25rem;
   }
   
-  .profile-card input:focus {
-    border-color: #00ADB5;
-    box-shadow: 0 0 5px rgba(0, 173, 181, 0.5);
+  .form-actions {
+    flex-direction: column;
   }
   
-  .btn-primary {
-    background-color: #00ADB5;
-    border: none;
-    transition: 0.3s;
+  .btn {
+    width: 100%;
   }
-  
-  .btn-primary:hover {
-    background-color: #007F8B;
-  }
-  
-  .btn-danger {
-    background-color: #FF4C29;
-    border: none;
-    transition: 0.3s;
-  }
-  
-  .btn-danger:hover {
-    background-color: #FF2C00;
-  }
-
-  p{
-    font-size: large;
-  }
-  
+}

@@ -40,7 +40,8 @@ export class AuthService {
         encryptedPayload,
         { withCredentials: true }
       );
-      console.log('response', response);
+
+      // console.log(response);
       if (response.data) {
         // console.log(response.data.user);
         this.cookieService.set('session', 'true', { path: '/' });
@@ -48,7 +49,7 @@ export class AuthService {
       }
       return response;
     } catch (error) {
-      // console.log('error auth', error);
+      // console.log( error);
       throw error;
     }
   }

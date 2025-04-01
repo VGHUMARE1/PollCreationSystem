@@ -1,58 +1,118 @@
 <div class="poll-container">
-  <h2 class="poll-title">{{ poll?.question }}</h2>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+
+  <h1 class="poll-title">{{ poll?.question }}</h1>
   
   <div class="poll-meta">
-    <p><strong>Created By:</strong> {{ pollCreator.name }} ({{ pollCreator.email }})</p>
-    <p><strong>Status:</strong> <span class="status-badge">{{ poll?.status | uppercase }}</span></p>
-  </div>
-
-  <div class="chart-container">
-    <div class="chart">
-      <h3>Poll Results (Pie Chart)</h3>
-      <ngx-charts-pie-chart 
-        [results]="pieChartData"
-        [scheme]="pieChartColorScheme"
-        [legend]="true"
-        [animations]="true">
-      </ngx-charts-pie-chart>
+    <div class="poll-meta-item">
+      <span class="poll-meta-label">Created By</span>
+      <span class="poll-meta-value">{{ pollCreator.name || 'Unknown' }}</span>
     </div>
-
-    <div class="chart">
-      <h3>Votes Per Option (Bar Chart)</h3>
-      <ngx-charts-bar-vertical
-        [results]="barChartData"
-        [scheme]="barChartColorScheme"
-        [legend]="true"
-        [animations]="true">
-      </ngx-charts-bar-vertical>
+    
+    <div class="poll-meta-item">
+      <span class="poll-meta-label">Status</span>
+      <span class="status-badge {{ poll?.status }}">{{ poll?.status | uppercase }}</span>
+    </div>
+    
+    <div class="poll-meta-item">
+      <span class="poll-meta-label">Total Votes</span>
+      <span class="poll-meta-value">{{ voters.length }}</span>
     </div>
   </div>
 
-  <h3>Voter Details</h3>
-  <div class="table-responsive">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Voted For</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let voter of voters">
-          <td>{{ voter.name }}</td>
-          <td>{{ voter.email }}</td>
-          <td>{{ getVotedOptionText(voter.votedOptionId) }}</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="chart-section">
+    <h2 class="section-title">
+      <mat-icon>insert_chart</mat-icon>
+      Results
+    </h2>
+    
+    <div class="chart-container">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Distribution</h3>
+          <mat-icon>pie_chart</mat-icon>
+        </div>
+        <ngx-charts-pie-chart 
+          [results]="pieChartData"
+          [scheme]="pieChartColorScheme"
+          [legend]="true"
+          [legendTitle]="''"
+          [labels]="true"
+          [doughnut]="true"
+          [arcWidth]="0.35"
+          [animations]="true"
+          [tooltipDisabled]="false"
+          [legendPosition]="legendPosition">
+        </ngx-charts-pie-chart>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Comparison</h3>
+          <mat-icon>bar_chart</mat-icon>
+        </div>
+        <ngx-charts-bar-vertical
+          [results]="barChartData"
+          [scheme]="barChartColorScheme"
+          [legend]="true"
+          [legendTitle]="''"
+          [showDataLabel]="true"
+          [animations]="true"
+          [tooltipDisabled]="false"
+          [legendPosition]="legendPosition"
+          [xAxis]="true"
+          [yAxis]="true"
+          [showXAxisLabel]="false"
+          [showYAxisLabel]="false"
+          [xAxisLabel]="'Options'"
+          [yAxisLabel]="'Votes'">
+        </ngx-charts-bar-vertical>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-section">
+    <h2 class="section-title">
+      <mat-icon>people</mat-icon>
+      Voters ({{ voters.length }})
+    </h2>
+    
+    <div class="table-responsive">
+      <table class="voters-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Voted For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let voter of voters">
+            <td>{{ voter.name || 'Anonymous' }}</td>
+            <td>{{ voter.email || 'N/A' }}</td>
+            <td>{{ getVotedOptionText(voter.votedOptionId) }}</td>
+          </tr>
+          <tr *ngIf="voters.length === 0">
+            <td colspan="3" class="no-voters">No voters have participated yet</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="action-buttons">
-    <button class="btn btn-danger" (click)="deletePoll()">Delete</button>
-    <button class="btn btn-warning" (click)="togglePollStatus()">
-      {{ poll?.status === 'active' ? 'Stop Poll' : 'Activate Poll' }}
+    <button mat-raised-button class="action-button delete-button" (click)="deletePoll()">
+      <mat-icon>delete</mat-icon> Delete
     </button>
-    <button class="btn btn-primary" (click)="editPoll()">Edit</button>
+    <button mat-raised-button class="action-button toggle-button" (click)="togglePollStatus()">
+      <mat-icon>{{ poll?.status === 'active' ? 'pause' : 'play_arrow' }}</mat-icon>
+      {{ poll?.status === 'active' ? 'Stop' : 'Start' }}
+    </button>
+    <button mat-raised-button class="action-button edit-button" (click)="editPoll()">
+      <mat-icon>edit</mat-icon> Edit
+    </button>
   </div>
 </div>

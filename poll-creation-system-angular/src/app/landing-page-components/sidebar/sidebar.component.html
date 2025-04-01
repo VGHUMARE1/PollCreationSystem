@@ -9,7 +9,7 @@
         <p *ngIf="userProfile?.phone_no">{{ userProfile?.phone_no }}</p>
       </div>
       <button class="toggle-btn" (click)="toggleSidebar()">
-        {{ isCollapsed ? '☰' : '×' }}
+        <i [class]="isCollapsed ? 'bi bi-list' : 'bi bi-x-lg'"></i>
       </button>
     </div>
   </div>
@@ -20,14 +20,6 @@
       <div class="spinner-border text-light" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-    </div>
-
-    <!-- Error State -->
-    <div *ngIf="profileError && !isLoading" class="error-section">
-      <p class="text-warning">{{ profileError }}</p>
-      <button class="btn btn-sm btn-outline-light" (click)="loadUserProfile()">
-        Retry
-      </button>
     </div>
 
     <!-- Navigation Links -->

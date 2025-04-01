@@ -13,6 +13,7 @@ import { EditPollComponent } from './poll-components/edit-poll/edit-poll.compone
 import { LandingPageComponent } from './landing-page-components/landing-page/landing-page.component';
 import { PollAnalysisComponent } from './poll-components/poll-analysis/poll-analysis.component';
 import { UserVotedPollsComponent } from './poll-components/user-voted-polls/user-voted-polls.component';
+import { PollComponent } from './poll-components/poll/poll.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -32,6 +33,7 @@ export const routes: Routes = [
       { path: 'poll-analysis/:id', component: PollAnalysisComponent },
       { path: 'edit-poll/:id', component: EditPollComponent },
       { path: 'voted-polls', component: UserVotedPollsComponent },
+      { path: 'poll/:pollId', component: PollComponent },
       //  Nested route
     ],
   },

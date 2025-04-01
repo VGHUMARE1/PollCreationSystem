@@ -1,75 +1,90 @@
 <div class="container mt-4">
- 
-    <div class="logo">
-      <h1>
-    <i class="fas fa-user-circle"></i> Your Polls</h1>
+  <div class="logo">
+    <h1><i class="fas fa-user-circle"></i> Your Polls</h1>
   </div>
 
+  <!-- Loading Indicator -->
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading your polls...</p>
+  </div>
 
-  <div class="row justify-content-center">
-    <div *ngFor="let poll of getPaginatedPolls()" class="col-md-8">
-      <div class="card poll-card shadow-lg fade-in">
-        <div class="card-body">
-          <h5 class="card-title">{{ poll.question }}</h5>
-          <p class="text-muted">Created By: {{ poll.creatorName }}</p>
-          <p class="text-muted">Expires: {{ poll.expiryDate }}</p>
-          <p class="text-muted">Total Votes: {{ poll.totalVotes }}</p>
-          <p class="badge status-badge" [ngClass]="poll.status === 'active' ? 'bg-success' : 'bg-danger'">
-            {{ poll.status }}
-          </p>
-
-          <!-- Poll Options with Vote Percentage -->
-          <ul class="list-group">
-            <li *ngFor="let option of poll.options" class="list-group-item">
-              <div class="d-flex justify-content-between">
-                <span>{{ option.optionText }}</span>
-                <span>{{ getVotePercentage(option.votes, poll.totalVotes) }}%</span>
+  <div *ngIf="!isLoading">
+    <div *ngIf="myPolls.length > 0; else noPolls">
+      <div class="row justify-content-center">
+        <div *ngFor="let poll of getPaginatedPolls(); trackBy: trackByPollId" class="col-md-8 mb-4">
+          <div class="card poll-card shadow-lg fade-in">
+            <div class="card-body">
+              <h5 class="card-title">{{ poll.question }}</h5>
+              <div class="poll-meta">
+                <span class="badge status-badge" [ngClass]="poll.status === 'active' ? 'bg-success' : 'bg-danger'">
+                  {{ poll.status | titlecase }}
+                </span>
+                <span class="text-muted">Expires: {{ poll.expiryDate | date }}</span>
+                <span class="text-muted">Votes: {{ poll.totalVotes }}</span>
               </div>
-              <div class="progress animated-progress">
-                <div class="progress-bar"
-                     role="progressbar"
-                     [style.width]="getVotePercentage(option.votes, poll.totalVotes) + '%'">
-                </div>
-              </div>
-            </li>
-          </ul>
 
-          <!-- Single Action Button -->
-          <div class="poll-actions mt-3 text-center">
-            <button class="btn btn-analysis" (click)="viewPollAnalysis(poll.id)">View Poll Analysis</button>
+              <!-- Poll Options with Vote Percentage -->
+              <ul class="list-group mt-3">
+                <li *ngFor="let option of poll.options" class="list-group-item">
+                  <div class="d-flex justify-content-between">
+                    <span>{{ option.optionText }}</span>
+                    <span>{{ getVotePercentage(option.votes, poll.totalVotes) }}%</span>
+                  </div>
+                  <div class="progress mt-2">
+                    <div class="progress-bar"
+                         role="progressbar"
+                         [style.width]="getVotePercentage(option.votes, poll.totalVotes) + '%'"
+                         [attr.aria-valuenow]="getVotePercentage(option.votes, poll.totalVotes)"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                    </div>
+                  </div>
+                </li>
+              </ul>
+
+              <!-- Action Button -->
+              <div class="poll-actions mt-3 text-center">
+                <button class="btn btn-primary" (click)="viewPollAnalysis(poll.id)">
+                  <i class="fas fa-chart-bar"></i> View Analysis
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  
-    <div *ngIf="myPolls.length > 0; else noPolls">
-      <!-- Existing poll cards content -->
-      <div class="row justify-content-center">
-        <div *ngFor="let poll of getPaginatedPolls()" class="col-md-8">
-          <!-- Your existing poll card content -->
-        </div>
-      </div>
-  
       <!-- Pagination Controls -->
-      <div class="pagination-controls text-center mt-3">
-        <button class="btn btn-nav" (click)="prevPage()" [disabled]="currentPage === 1">Previous</button>
-        <span class="page-indicator">Page {{ currentPage }}</span>
-        <button class="btn btn-nav" (click)="nextPage()" [disabled]="currentPage * pollsPerPage >= myPolls.length">Next</button>
+      <div class="pagination-controls text-center mt-4">
+        <button class="btn btn-outline-primary me-2" 
+                (click)="prevPage()" 
+                [disabled]="currentPage === 1">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+        <span class="page-indicator mx-3">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button class="btn btn-outline-primary ms-2" 
+                (click)="nextPage()" 
+                [disabled]="currentPage >= totalPages">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
       </div>
     </div>
-  
+
     <ng-template #noPolls>
-      <div class="no-polls-container">
+      <div class="no-polls-container text-center py-5">
         <div class="no-polls-content">
-          <i class="fas fa-poll-h fa-4x no-polls-icon"></i>
+          <i class="fas fa-poll-h fa-4x text-muted mb-4"></i>
           <h3 class="no-polls-title">No Polls Created Yet</h3>
-          <p class="no-polls-message">You haven't created any polls. Start by creating your first poll!</p>
-          <button class="btn btn-create" (click)="createNewPoll()">
-            <i class="fas fa-plus-circle"></i> Create Your First Poll
+          <p class="no-polls-message text-muted mb-4">
+            You haven't created any polls. Start by creating your first poll!
+          </p>
+          <button class="btn btn-primary btn-lg" (click)="createNewPoll()">
+            <i class="fas fa-plus-circle me-2"></i> Create Your First Poll
           </button>
         </div>
       </div>
     </ng-template>
   </div>
+</div>

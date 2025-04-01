@@ -14,7 +14,7 @@ export class PollService {
   // Fetch poll data by ID
  async getPollById(pollId: string): Promise<any> {
     try {
-      const response = await axios.get(`${this.apiUrl}/${pollId}`);
+      const response = await axios.get(`${this.apiUrl}/${pollId}`, { withCredentials: true });
       return response.data;
     } catch (error) {
       console.error('Error fetching poll:', error);
@@ -25,7 +25,7 @@ export class PollService {
   // Update poll
    async updatePoll(pollId: string, pollData: any): Promise<any> {
     try {
-      const response = await axios.put(`${this.apiUrl}/${pollId}`, pollData);
+      const response = await axios.put(`${this.apiUrl}/${pollId}`, pollData, { withCredentials: true });
       return response.data;
     } catch (error) {
       console.error('Error updating poll:', error);
@@ -50,6 +50,7 @@ export class PollService {
 
   // Submit a vote
   async submitVote(pollId: string, optionIds: number[]): Promise<{ message: string }> {
+    console.log(pollId)
     try {
       const response = await axios.post(`${this.apiUrl}/vote`, {
         pollId,
@@ -57,7 +58,7 @@ export class PollService {
       }, { withCredentials: true });
       return response.data;
     } catch (error) {
-      console.error('Error submitting vote:', error);
+      // console.error('Error submitting vote:', error);
       throw error;
     }
   }

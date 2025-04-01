@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PollService } from '../../services/poll.service';
+import { ToastrService } from 'ngx-toastr';
 
 interface PollOption {
   id: number;
@@ -36,7 +37,7 @@ export class UserVotedPollsComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string | null = null;
 
-  constructor(private pollService: PollService) {}
+  constructor(private pollService: PollService, private toastr: ToastrService) {}
 
   async ngOnInit() {
     await this.loadVotedPolls();
@@ -97,7 +98,8 @@ export class UserVotedPollsComponent implements OnInit {
   
     try {
       await this.pollService.deleteVote(pollId);
-      alert('Vote deleted successfully');
+      this.toastr.success('Vote deleted successfully')
+      // alert('Vote deleted successfully');
       await this.loadVotedPolls();
     } catch (error: any) {
       this.handleVoteError(error, 'deleting');
@@ -106,7 +108,7 @@ export class UserVotedPollsComponent implements OnInit {
 
   async changeVote(poll: VotedPoll) {
     if (!poll.selectedOptions?.some(selected => selected)) {
-      alert('Please select at least one option');
+      this.toastr.warning('Please select at least one option');
       return;
     }
   
@@ -114,7 +116,7 @@ export class UserVotedPollsComponent implements OnInit {
       const optionIds = this.getSelectedOptionIds(poll);
       await this.pollService.changeVote({ pollId: poll._id, optionIds });
       
-      alert('Vote changed successfully!');
+      this.toastr.success('Vote changed successfully!');
       this.editingPollId = null;
       await this.loadVotedPolls();
     } catch (error: any) {
@@ -135,7 +137,7 @@ export class UserVotedPollsComponent implements OnInit {
                    error.message || 
                    `An error occurred while ${action} the vote.`;
     
-    alert(message);
+    this.toastr.error(message);
   }
 
   // Pagination methods

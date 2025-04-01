@@ -1,6 +1,6 @@
 import {
   Title
-} from "./chunk-AMAYUVGG.js";
+} from "./chunk-E4IOG4KY.js";
 import {
   DOCUMENT,
   HashLocationStrategy,

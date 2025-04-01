@@ -4,6 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PollService } from '../../services/poll.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-edit-poll',
@@ -29,7 +30,8 @@ export class EditPollComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     public router: Router,
-    private pollService: PollService
+    private pollService: PollService,
+    private toastr: ToastrService
   ) {
     this.initializeForms();
   }
@@ -66,7 +68,7 @@ export class EditPollComponent implements OnInit {
       this.populateAllFormFields();
     } catch (error) {
       console.error('Error fetching poll:', error);
-      alert('Failed to load poll data. Please try again.');
+      this.toastr.error('Failed to load poll data. Please try again.', 'Error');
       this.router.navigate(['/polls']);
     } finally {
       this.loading = false;
@@ -125,7 +127,7 @@ export class EditPollComponent implements OnInit {
 
   async updatePollDetails() {
     if (this.pollForm.invalid) {
-      alert('Please fix all errors before submitting.');
+      this.toastr.warning('Please fix all errors before submitting.', 'Validation Error');
       return;
     }
 
@@ -143,11 +145,11 @@ export class EditPollComponent implements OnInit {
       };
       
       await this.pollService.updatePollDetails(data);
-      alert('Poll details updated successfully!');
+      this.toastr.success('Poll details updated successfully!', 'Success');
       this.pollData.question = question;
     } catch (error) {
       console.error('Error updating poll details:', error);
-      alert('Failed to update poll details. Please try again.');
+      this.toastr.error('Failed to update poll details. Please try again.', 'Error');
     } finally {
       this.savingDetails = false;
     }
@@ -155,7 +157,7 @@ export class EditPollComponent implements OnInit {
 
   async updateExpiryDate() {
     if (this.expiryForm.invalid) {
-      alert('Please select a valid future date and time.');
+      this.toastr.warning('Please select a valid future date and time.', 'Validation Error');
       return;
     }
   
@@ -173,10 +175,10 @@ export class EditPollComponent implements OnInit {
       await this.pollService.updateExpiryDate(this.pollId, expiryDateTime);
       this.originalExpiryDate = expiryDateTime;
       this.pollData.expiryDateTime = expiryDateTime;
-      alert(`Expiry date updated successfully for Poll ID: ${this.pollId}`);
+      this.toastr.success(`Expiry date updated successfully for Poll ID: ${this.pollId}`, 'Success');
     } catch (error: any) {
       console.error("Error updating expiry date:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Failed to update expiry date. Please try again.");
+      this.toastr.error(error.response?.data?.message || "Failed to update expiry date. Please try again.", 'Error');
     } finally {
       this.savingExpiry = false;
     }

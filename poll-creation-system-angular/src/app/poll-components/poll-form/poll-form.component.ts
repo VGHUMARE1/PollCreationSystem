@@ -4,11 +4,26 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { PollService } from '../../services/poll.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-poll-form',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [
+    FormsModule, 
+    CommonModule,
+    MatSnackBarModule,
+    MatButtonModule,
+    MatInputModule,
+    MatCheckboxModule,
+    MatCardModule,
+    MatIconModule
+  ],
   templateUrl: './poll-form.component.html',
   styleUrls: ['./poll-form.component.css']
 })
@@ -23,7 +38,8 @@ export class PollFormComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private pollService: PollService
+    private pollService: PollService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -114,13 +130,22 @@ export class PollFormComponent implements OnInit {
   }
 
   private handleSuccess() {
-    alert('Poll successfully created');
+    this.showToast('Poll successfully created', 'success');
     this.router.navigate(['/home/my-polls']);
   }
 
   private handleError(error: any) {
     console.error('Error creating poll:', error);
     const message = error.response?.data?.message || error.message || 'Failed to create poll. Please try again.';
-    alert(message);
+    this.showToast(message, 'error');
+  }
+
+  private showToast(message: string, type: 'success' | 'error') {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: type === 'success' ? ['toast-success'] : ['toast-error'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
   }
 }

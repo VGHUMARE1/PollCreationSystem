@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PollService } from '../../services/poll.service';
 import { Poll, Option } from '../../model/poll.model';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-active-polls',
@@ -21,7 +22,11 @@ export class ActivePollsComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string | null = null;
   
-  constructor(private router: Router, private pollService: PollService) {}
+  constructor(
+    private router: Router, 
+    private pollService: PollService,
+    private toastr: ToastrService
+  ) {}
 
   async ngOnInit(): Promise<void> {
     await this.fetchActivePolls();
@@ -38,6 +43,7 @@ export class ActivePollsComponent implements OnInit {
     } catch (error) {
       console.error('Error fetching active polls:', error);
       this.errorMessage = 'Failed to load polls. Please try again later.';
+      this.toastr.error('Failed to load polls. Please try again later.', 'Error');
     } finally {
       this.isLoading = false;
     }
@@ -107,8 +113,8 @@ export class ActivePollsComponent implements OnInit {
     try {
       const optionIds = this.getSelectedOptionIds(poll);
       const response = await this.pollService.submitVote(poll._id, optionIds);
-      alert(response.message);
-      this.router.navigate(['/home/voted-polls']);
+      this.toastr.success(response.message, 'Success');
+      // this.router.navigate(['/home/voted-polls']);
       await this.fetchActivePolls();
     } catch (error: any) {
       this.handleVoteError(error);
@@ -119,11 +125,11 @@ export class ActivePollsComponent implements OnInit {
     if (poll.allowMultiple) {
       const selectedCount = poll.selectedOptions?.filter(Boolean).length || 0;
       if (selectedCount === 0) {
-        alert('Please select at least one option');
+        this.toastr.warning('Please select at least one option', 'Warning');
         return false;
       }
     } else if (poll.selectedOption === null || poll.selectedOption === undefined) {
-      alert('Please select an option');
+      this.toastr.warning('Please select an option', 'Warning');
       return false;
     }
     return true;
@@ -142,7 +148,7 @@ export class ActivePollsComponent implements OnInit {
     const message = error.response?.data?.message 
       || error.message 
       || "An error occurred while submitting your vote.";
-    alert(message);
+    this.toastr.error(message, 'Error');
   }
 
   trackByOption(index: number, option: Option): number {

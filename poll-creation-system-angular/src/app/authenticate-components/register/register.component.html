@@ -55,10 +55,12 @@
         />
         <div class="error" *ngIf="isInvalid('email')">
           <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
-          <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+          <span *ngIf="registerForm.get('email')?.errors?.['email'] || registerForm.get('email')?.errors?.['pattern']">
+            Please enter a valid email
+          </span>
         </div>
         <div class="error" *ngIf="emailExists">
-          Email already exists! <a routerLink="/login">Try logging in?</a>
+          Email already registered. <a routerLink="/login">Try logging in?</a>
         </div>
         
         <!-- OTP Section -->
@@ -67,40 +69,39 @@
                   (click)="sendEmailOTP()" 
                   [disabled]="isSendingOTP || otpResendTimer > 0">
             <span *ngIf="!isSendingOTP">
-              {{ otpResendTimer > 0 ? ('Resend OTP in ' + otpResendTimer + 's') : 'Send OTP' }}
+              {{ otpResendTimer > 0 ? ('Resend in ' + otpResendTimer + 's') : 'Send Verification OTP' }}
             </span>
-            <span *ngIf="isSendingOTP">Sending OTP...</span>
+            <span *ngIf="isSendingOTP" class="loading-spinner"></span>
           </button>
-          <span class="otp-sent" *ngIf="emailOTPSent && !emailVerified">
-            OTP sent successfully!
-          </span>
         </div>
     
         <div class="otp-verify" *ngIf="emailOTPSent && !emailVerified">
-          <input 
-            type="text" 
-            placeholder="Enter OTP" 
-            formControlName="otp"
-            maxlength="6"
-            class="otp-input"
-            [class.error-highlight]="otpError"
-          />
-          <button type="button" class="verify-btn" 
-                  (click)="verifyEmailOTP()" 
-                  [disabled]="registerForm.get('otp')?.invalid || isVerifyingOTP">
-            <span *ngIf="!isVerifyingOTP">Verify</span>
-            <span *ngIf="isVerifyingOTP">Verifying...</span>
-          </button>
-          <div class="attempts" *ngIf="otpAttempts > 0">
-            Attempts: {{otpAttempts}}/{{maxOtpAttempts}}
+          <div class="otp-input-group">
+            <input 
+              type="text" 
+              placeholder="Enter 6-digit OTP" 
+              formControlName="otp"
+              maxlength="6"
+              class="otp-input"
+              [class.error]="otpError"
+            />
+            <button type="button" class="verify-btn" 
+                    (click)="verifyEmailOTP()" 
+                    [disabled]="registerForm.get('otp')?.invalid || isVerifyingOTP">
+              <span *ngIf="!isVerifyingOTP">Verify</span>
+              <span *ngIf="isVerifyingOTP" class="loading-spinner"></span>
+            </button>
           </div>
-          <div class="error" *ngIf="otpError">
-            {{ otpError }}
+          <div class="otp-meta">
+            <span class="attempts" *ngIf="otpAttempts > 0">
+              Attempts: {{otpAttempts}}/{{maxOtpAttempts}}
+            </span>
+            <span class="otp-note">Check your email for the verification code</span>
           </div>
         </div>
         
-        <div class="success" *ngIf="emailVerified">
-          Email verified successfully!
+        <div class="success-message" *ngIf="emailVerified">
+          <i class="verified-icon">✓</i> Email verified successfully!
         </div>
       </div>
 
@@ -110,13 +111,13 @@
           <input 
             id="password" 
             [type]="showPassword ? 'text' : 'password'" 
-            placeholder="Create a password" 
+            placeholder="Create a password (min 8 characters)" 
             formControlName="password"
             [class.invalid]="isInvalid('password')"
             autocomplete="new-password"
           />
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility('password')">
-            {{ showPassword ? '🙈' : '👁️' }}
+            <i class="icon" [ngClass]="showPassword ? 'icon-eye-off' : 'icon-eye'"></i>
           </button>
         </div>
         <div class="error" *ngIf="isInvalid('password')">
@@ -140,7 +141,7 @@
             autocomplete="new-password"
           />
           <button type="button" class="toggle-password" (click)="togglePasswordVisibility('confirmPassword')">
-            {{ showConfirmPassword ? '🙈' : '👁️' }}
+            <i class="icon" [ngClass]="showConfirmPassword ? 'icon-eye-off' : 'icon-eye'"></i>
           </button>
         </div>
         <div class="error" *ngIf="registerForm.hasError('mismatch') && registerForm.get('confirmPassword')!.touched">
@@ -157,16 +158,20 @@
           formControlName="phone_no"
           [class.invalid]="isInvalid('phone_no')"
           autocomplete="tel"
+          maxlength="10"
         />
         <div class="error" *ngIf="isInvalid('phone_no')">
           <span *ngIf="registerForm.get('phone_no')?.errors?.['required']">Phone number is required</span>
-          <span *ngIf="registerForm.get('phone_no')?.errors?.['pattern']">Please enter a valid 10-digit number</span>
+          <span *ngIf="registerForm.get('phone_no')?.errors?.['pattern'] || registerForm.get('phone_no')?.errors?.['minlength'] || registerForm.get('phone_no')?.errors?.['maxlength']">
+            Please enter a valid 10-digit number
+          </span>
         </div>
       </div>
 
       <div class="form-group terms">
-        <input type="checkbox" id="terms" formControlName="terms" />
-        <label for="terms">
+        <label class="terms-checkbox">
+          <input type="checkbox" id="terms" formControlName="terms" />
+          <span class="checkmark"></span>
           I agree to the <a href="#" target="_blank">Terms of Service</a> and <a href="#" target="_blank">Privacy Policy</a>
         </label>
         <div class="error" *ngIf="registerForm.get('terms')?.invalid && registerForm.get('terms')?.touched">
@@ -176,16 +181,12 @@
 
       <button type="submit" class="submit-btn" [disabled]="registerForm.invalid || emailExists || !emailVerified || isSubmitting">
         <span *ngIf="!isSubmitting">Create Account</span>
-        <span *ngIf="isSubmitting">Creating account...</span>
+        <span *ngIf="isSubmitting" class="loading-spinner"></span>
       </button>
 
       <div class="login-link">
         Already have an account? <a href="/login">Sign in</a>
       </div>
     </form>
-
-    <div class="message" [class.success]="isSuccess" [class.error]="!isSuccess && message" *ngIf="message">
-      {{ message }}
-    </div>
   </div>
 </div>

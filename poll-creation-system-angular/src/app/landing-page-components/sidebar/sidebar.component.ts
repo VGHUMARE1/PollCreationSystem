@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import axios from 'axios';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from './../../services/profile.service';
+import { ToastrService } from 'ngx-toastr';
 
 interface UserProfile {
   email: string;
@@ -15,44 +15,46 @@ interface UserProfile {
 
 @Component({
   selector: 'app-sidebar',
-  imports : [CommonModule,RouterModule],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit {
   isCollapsed = false;
   isLoading = true;
-  profileError: string | null = null;
   userProfile: UserProfile | null = null;
 
-  constructor( private authService: AuthService,private profileService: ProfileService,private router: Router) {
-
+  constructor(
+    private authService: AuthService,
+    private profileService: ProfileService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {
+    this.loadUserProfile();
   }
-
+  
   async ngOnInit() {
-    if(!this.authService.isLoggedIn()){
+    if (!this.authService.isLoggedIn()) {
+      localStorage.setItem("redirecttUrl", this.router.url);
       this.router.navigate(['/login']);
     }
     await this.loadUserProfile();
-   
   }
 
   async loadUserProfile() {
     this.isLoading = true;
-    this.profileError = null;
     
     try {
       const response = await this.profileService.getUserProfile();
-      // console.log(response);
       this.userProfile = {
         email: response.email,
         first_name: response.first_name || '',
         last_name: response.last_name || '',
         phone_no: response.phone_no || null
       };
-      
     } catch (error) {
-      this.profileError = 'Failed to load profile';
+      this.toastr.error('Failed to load profile data');
       console.error('Profile load error:', error);
     } finally {
       this.isLoading = false;
@@ -75,15 +77,18 @@ export class SidebarComponent implements OnInit {
 
   async logout() {
     try {
-      const response = await this.authService.logout();
-      console.log(response);
+      await this.authService.logout();
+      this.toastr.success('Logged out successfully');
       this.router.navigate(['/']);
     } catch (error) {
-      console.log(error);
+      this.toastr.error('Failed to logout. Please try again.');
+      console.error('Logout error:', error);
     }
   }
 
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
+    const message = this.isCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded';
+    this.toastr.info(message, '', { timeOut: 1000 });
   }
 }

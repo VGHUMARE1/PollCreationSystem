@@ -1,0 +1,91 @@
+<div class="poll-container">
+  <!-- Toast Notification -->
+  <div *ngIf="showToast" class="toast toast-{{toastType}}">
+    <div class="toast-content">
+      <i class="fas" 
+         [class.fa-check-circle]="toastType === 'success'"
+         [class.fa-exclamation-circle]="toastType === 'warning'"
+         [class.fa-times-circle]="toastType === 'error'"></i>
+      <span>{{ toastMessage }}</span>
+    </div>
+    <div class="progress-bar"></div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading poll...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="error-state">
+    <p>{{ errorMessage }}</p>
+    <button (click)="fetchPoll()">Retry</button>
+  </div>
+
+  <!-- Poll Content -->
+  <div *ngIf="poll && !isLoading" class="poll-content">
+    <!-- Header -->
+    <div class="poll-header">
+      <span class="poll-type" [class.multiple]="poll.allowMultiple" [class.single]="!poll.allowMultiple">
+        {{ poll.allowMultiple ? 'MULTIPLE CHOICE' : 'SINGLE CHOICE' }}
+      </span>
+      <h1 class="poll-question">{{ poll.question }}</h1>
+      <div class="poll-meta">
+        <span><i class="fas fa-user"></i> {{ poll.creator.name }}</span>
+        <span><i class="fas fa-clock"></i> {{ poll.expiryDateTime | date:'medium' }}</span>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="poll-options">
+      <!-- Multiple Choice -->
+      <ng-container *ngIf="poll.allowMultiple">
+        <div *ngFor="let option of poll.options; let i = index; trackBy: trackByOption" 
+             class="option" [class.selected]="poll.selectedOptions?.[i]">
+          <label>
+            <input type="checkbox"
+                   [name]="'poll_' + poll.id"
+                   [(ngModel)]="poll.selectedOptions![i]"
+                   [disabled]="hasVoted">
+            <span class="custom-checkbox"></span>
+            <span class="option-text">
+              {{ option.optionText }}
+              <span class="vote-count-badge">{{ option.votes }} {{ option.votes === 1 ? 'vote' : 'votes' }}</span>
+            </span>
+          </label>
+        </div>
+      </ng-container>
+
+      <!-- Single Choice -->
+      <ng-container *ngIf="!poll.allowMultiple">
+        <div *ngFor="let option of poll.options; trackBy: trackByOption" 
+             class="option" [class.selected]="poll.selectedOption === option.id">
+          <label>
+            <input type="radio"
+                   [name]="'poll_' + poll.id"
+                   [(ngModel)]="poll.selectedOption"
+                   [value]="option.id"
+                   [disabled]="hasVoted">
+            <span class="custom-radio"></span>
+            <span class="option-text">
+              {{ option.optionText }}
+            </span>
+          </label>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Footer -->
+    <div class="poll-footer">
+      <div class="total-votes">
+        <i class="fas fa-chart-bar"></i>
+        <span>{{ totalVotes }} {{ totalVotes === 1 ? 'total vote' : 'total votes' }}</span>
+      </div>
+      <button class="vote-button" (click)="submitVote()" [disabled]="hasVoted">
+        <i class="fas fa-paper-plane"></i>
+        <span>{{ hasVoted ? 'Vote Submitted' : 'Submit Vote' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
