@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -34,7 +34,7 @@ export class RegisterComponent {
     private authService: AuthService,
     private router: Router,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private toastService: ToastService
   ) {
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/home/new-poll']);
@@ -94,7 +94,7 @@ export class RegisterComponent {
       try {
         this.emailExists = await this.authService.checkEmailExists(email);
         if (this.emailExists) {
-          this.toastr.warning('Email already exists! Try logging in instead.');
+          this.toastService.showToast('Email already exists! Try logging in instead.','info');
           this.emailVerified = false;
           this.emailOTPSent = false;
           this.registerForm.get('otp')?.reset();
@@ -118,7 +118,7 @@ export class RegisterComponent {
     
     try {
       await this.authService.sendEmailOTP(email);
-      this.toastr.success('OTP sent successfully!');
+      this.toastService.showToast('OTP sent successfully!','success');
       this.isSendingOTP = false;
       this.emailOTPSent = true;
       this.emailVerified = false;
@@ -128,7 +128,7 @@ export class RegisterComponent {
       setTimeout(() => {
         if (!this.emailVerified) {
           this.otpError = 'OTP expired. Please request a new one.';
-          this.toastr.warning('OTP has expired. Please request a new one.');
+          this.toastService.showToast('OTP has expired. Please request a new one.','info');
           this.emailOTPSent = false;
           this.registerForm.get('otp')?.reset();
         }
@@ -136,7 +136,7 @@ export class RegisterComponent {
     } catch (error) {
       this.isSendingOTP = false;
       this.otpError = 'Failed to send OTP. Please try again.';
-      this.toastr.error('Failed to send OTP. Please try again.');
+      this.toastService.showToast('Failed to send OTP. Please try again.','error');
       console.error('OTP send error:', error);
     }
   }
@@ -153,14 +153,14 @@ export class RegisterComponent {
 
   verifyEmailOTP() {
     if (this.registerForm.get('otp')?.invalid) {
-      this.toastr.warning('Please enter a valid 6-digit OTP');
+      this.toastService.showToast('Please enter a valid 6-digit OTP','info');
       return;
     }
 
     this.otpAttempts++;
     if (this.otpAttempts >= this.maxOtpAttempts) {
       this.otpError = 'Maximum attempts reached. Please request a new OTP.';
-      this.toastr.error('Maximum attempts reached. Please request a new OTP.');
+      this.toastService.showToast('Maximum attempts reached. Please request a new OTP.','error');
       this.emailOTPSent = false;
       this.registerForm.get('otp')?.reset();
       return;
@@ -176,19 +176,19 @@ export class RegisterComponent {
       next: (res) => {
         this.isVerifyingOTP = false;
         if (res.verified) {
-          this.toastr.success('Email verified successfully!');
+          this.toastService.showToast('Email verified successfully!','success');
           this.emailVerified = true;
           this.emailOTPSent = false;
           clearInterval(this.otpResendInterval);
         } else {
           this.otpError = 'Invalid OTP. Please try again.';
-          this.toastr.error('Invalid OTP. Please try again.');
+          this.toastService.showToast('Invalid OTP. Please try again.','error');
         }
       },
       error: (err) => {
         this.isVerifyingOTP = false;
         this.otpError = 'Verification failed. Please try again.';
-        this.toastr.error('Verification failed. Please try again.');
+        this.toastService.showToast('Verification failed. Please try again.','error');
         console.error('OTP verification error:', err);
       }
     });
@@ -205,17 +205,17 @@ export class RegisterComponent {
   async register() {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
-      this.toastr.warning('Please fill all required fields correctly');
+      this.toastService.showToast('Please fill all required fields correctly','info');
       return;
     }
 
     if (this.emailExists) {
-      this.toastr.warning('Email already exists!');
+      this.toastService.showToast('Email already exists!','info');
       return;
     }
 
     if (!this.emailVerified) {
-      this.toastr.warning('Please verify your email first');
+      this.toastService.showToast('Please verify your email first','info');
       return;
     }
 
@@ -223,14 +223,14 @@ export class RegisterComponent {
 
     try {
       await this.authService.register(this.registerForm.value);
-      this.toastr.success('Registration successful! Redirecting...');
+      this.toastService.showToast('Registration successful! Redirecting...','success');
       
       setTimeout(() => {
         this.router.navigate(['/home/new-poll']);
       }, 1500);
     } catch (error) {
       console.error('Registration error:', error);
-      this.toastr.error('Registration failed. Please try again.');
+      this.toastService.showToast('Registration failed. Please try again.','error');
     } finally {
       this.isSubmitting = false;
     }

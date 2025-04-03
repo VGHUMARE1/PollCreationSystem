@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-poll-form',
@@ -39,7 +40,7 @@ export class PollFormComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private pollService: PollService,
-    private snackBar: MatSnackBar
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -130,22 +131,15 @@ export class PollFormComponent implements OnInit {
   }
 
   private handleSuccess() {
-    this.showToast('Poll successfully created', 'success');
+    this.toastService.showToast('Poll successfully created', 'success');
     this.router.navigate(['/home/my-polls']);
   }
 
   private handleError(error: any) {
     // console.error('Error creating poll:', error);
     const message = error.response?.data?.message || error.message || 'Failed to create poll. Please try again.';
-    this.showToast(message, 'error');
+    this.toastService.showToast(message, 'error');
   }
 
-  private showToast(message: string, type: 'success' | 'error') {
-    this.snackBar.open(message, 'Close', {
-      duration: 5000,
-      panelClass: type === 'success' ? ['toast-success'] : ['toast-error'],
-      horizontalPosition: 'right',
-      verticalPosition: 'top'
-    });
-  }
+  
 }

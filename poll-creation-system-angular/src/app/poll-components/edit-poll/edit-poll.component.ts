@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-edit-poll',
@@ -37,7 +38,7 @@ export class EditPollComponent implements OnInit {
     private route: ActivatedRoute,
     public router: Router,
     private pollService: PollService,
-    private toastr: ToastrService
+    private toastService: ToastService
   ) {
     this.initializeForms();
   }
@@ -74,7 +75,7 @@ export class EditPollComponent implements OnInit {
       this.populateAllFormFields();
     } catch (error) {
       console.error('Error fetching poll:', error);
-      this.toastr.error('Failed to load poll data. Please try again.', 'Error');
+      this.toastService.showToast('Failed to load poll data. Please try again.', 'error');
       this.router.navigate(['/polls']);
     } finally {
       this.loading = false;
@@ -133,7 +134,7 @@ export class EditPollComponent implements OnInit {
 
   async updatePollDetails() {
     if (this.pollForm.invalid) {
-      this.toastr.warning('Please fix all errors before submitting.', 'Validation Error');
+      this.toastService.showToast('Please fix all errors before submitting.', 'info');
       return;
     }
 
@@ -151,11 +152,11 @@ export class EditPollComponent implements OnInit {
       };
       
       await this.pollService.updatePollDetails(data);
-      this.toastr.success('Poll details updated successfully!', 'Success');
+      this.toastService.showToast('Poll details updated successfully!', 'success');
       this.pollData.question = question;
     } catch (error) {
-      console.error('Error updating poll details:', error);
-      this.toastr.error('Failed to update poll details. Please try again.', 'Error');
+      // console.error('Error updating poll details:', error);
+      this.toastService.showToast('Failed to update poll details. Please try again.', 'error');
     } finally {
       this.savingDetails = false;
     }
@@ -163,7 +164,7 @@ export class EditPollComponent implements OnInit {
 
   async updateExpiryDate() {
     if (this.expiryForm.invalid) {
-      this.toastr.warning('Please select a valid future date and time.', 'Validation Error');
+      this.toastService.showToast('Please select a valid future date and time.', 'info');
       return;
     }
   
@@ -181,10 +182,10 @@ export class EditPollComponent implements OnInit {
       await this.pollService.updateExpiryDate(this.pollId, expiryDateTime);
       this.originalExpiryDate = expiryDateTime;
       this.pollData.expiryDateTime = expiryDateTime;
-      this.toastr.success(`Expiry date updated successfully for Poll ID: ${this.pollId}`, 'Success');
+      this.toastService.showToast(`Expiry date updated successfully for Poll ID: ${this.pollId}`, 'success');
     } catch (error: any) {
-      console.error("Error updating expiry date:", error.response?.data || error.message);
-      this.toastr.error(error.response?.data?.message || "Failed to update expiry date. Please try again.", 'Error');
+      // console.error("Error updating expiry date:", error.response?.data || error.message);
+      this.toastService.showToast(error.response?.data?.message || "Failed to update expiry date. Please try again.", 'error');
     } finally {
       this.savingExpiry = false;
     }

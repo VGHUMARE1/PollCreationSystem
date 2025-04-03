@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PollService } from '../../services/poll.service';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../services/toast.service';
 
 interface PollOption {
   id: number;
@@ -37,7 +37,7 @@ export class UserVotedPollsComponent implements OnInit {
   isLoading: boolean = false;
   errorMessage: string | null = null;
 
-  constructor(private pollService: PollService, private toastr: ToastrService) {}
+  constructor(private pollService: PollService, private toastService:ToastService) {}
 
   async ngOnInit() {
     await this.loadVotedPolls();
@@ -98,7 +98,8 @@ export class UserVotedPollsComponent implements OnInit {
   
     try {
       await this.pollService.deleteVote(pollId);
-      this.toastr.success('Vote deleted successfully')
+      this.toastService.showToast('Vote deleted successfully', 'success');
+      
       // alert('Vote deleted successfully');
       await this.loadVotedPolls();
     } catch (error: any) {
@@ -108,15 +109,16 @@ export class UserVotedPollsComponent implements OnInit {
 
   async changeVote(poll: VotedPoll) {
     if (!poll.selectedOptions?.some(selected => selected)) {
-      this.toastr.warning('Please select at least one option');
+      
+      this.toastService.showToast('Please select at least one option', 'info');
       return;
     }
   
     try {
       const optionIds = this.getSelectedOptionIds(poll);
       await this.pollService.changeVote({ pollId: poll._id, optionIds });
-      
-      this.toastr.success('Vote changed successfully!');
+      this.toastService.showToast('Vote changed successfully!', 'success');
+   
       this.editingPollId = null;
       await this.loadVotedPolls();
     } catch (error: any) {
@@ -136,8 +138,7 @@ export class UserVotedPollsComponent implements OnInit {
     const message = error.response?.data?.message || 
                    error.message || 
                    `An error occurred while ${action} the vote.`;
-    
-    this.toastr.error(message);
+                   this.toastService.showToast(message, 'error');
   }
 
   // Pagination methods

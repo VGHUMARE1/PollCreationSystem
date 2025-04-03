@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-poll-analysis',
@@ -50,7 +51,7 @@ export class PollAnalysisComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private pollService: PollService,
-    private snackBar: MatSnackBar
+    private toastService:ToastService
   ) {}
 
   ngOnInit() {
@@ -59,7 +60,7 @@ export class PollAnalysisComponent implements OnInit {
       this.loadPollData();
     } else {
       this.router.navigate(['/home/my-polls']);
-      this.showToast('Invalid poll ID', 'error');
+      this.toastService.showToast('Invalid poll ID', 'error');
     }
   }
 
@@ -80,7 +81,7 @@ async loadPollData() {
   } catch (error) {
     // console.error('Error loading poll data:', error);
     this.errorLoading = true;
-    this.showToast('Failed to load poll data', 'error');
+    this.toastService.showToast('Failed to load poll data', 'error');
     this.router.navigate(['/home/my-polls']);
   } finally {
     this.isLoading = false;
@@ -90,7 +91,7 @@ async loadPollData() {
 copyPollLink() {
   const url = `${window.location.origin}/poll/${this.pollId}`;
   navigator.clipboard.writeText(url);
-  this.showToast('Poll link copied to clipboard!', 'success');
+  this.toastService.showToast('Poll link copied to clipboard!', 'success');
 }
 
   private initializeCharts() {
@@ -124,25 +125,18 @@ copyPollLink() {
     return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
   }
 
-  private showToast(message: string, type: 'success' | 'error' | 'info' = 'info') {
-    this.snackBar.open(message, 'Close', {
-      duration: 5000,
-      panelClass: [`snackbar-${type}`],
-      horizontalPosition: 'right',
-      verticalPosition: 'top'
-    });
-  }
+ 
 
   async deletePoll() {
     // if (!confirm('Are you sure you want to delete this poll?')) return;
 
     try {
       await this.pollService.deletePoll(this.pollId);
-      this.showToast('Poll deleted successfully!', 'success');
+      this.toastService.showToast('Poll deleted successfully!', 'success');
       this.router.navigate(['/home/my-polls']);
     } catch (error) {
       // console.error('Error deleting poll:', error);
-      this.showToast('Failed to delete poll. Please try again.', 'error');
+      this.toastService.showToast('Failed to delete poll. Please try again.', 'error');
     }
   }
 
@@ -155,10 +149,10 @@ copyPollLink() {
     try {
       await this.pollService.updatePollStatus(this.pollId, newStatus);
       this.poll.status = newStatus;
-      this.showToast(`Poll status changed to ${newStatus}`, 'success');
+      this.toastService.showToast(`Poll status changed to ${newStatus}`, 'success');
     } catch (error) {
       // console.error('Error updating status:', error);
-      this.showToast('Failed to update poll status', 'error');
+      this.toastService.showToast('Failed to update poll status', 'error');
     }
   }
 

@@ -6,7 +6,7 @@ import { Observable, catchError, throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class UserService {
-  private emailApiUrl = 'http://172.16.16.11:8080/email/send';
+  private emailApiUrl = 'http://localhost:8080/email/send';
   private otpStorage: { [email: string]: string } = {};
 
   constructor(private http: HttpClient) { }

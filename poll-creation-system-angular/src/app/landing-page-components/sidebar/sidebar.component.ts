@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ProfileService } from './../../services/profile.service';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../services/toast.service';
 
 interface UserProfile {
   email: string;
@@ -29,7 +29,7 @@ export class SidebarComponent implements OnInit {
     private authService: AuthService,
     private profileService: ProfileService,
     private router: Router,
-    private toastr: ToastrService
+    private toastService: ToastService
   ) {
     this.loadUserProfile();
   }
@@ -54,7 +54,7 @@ export class SidebarComponent implements OnInit {
         phone_no: response.phone_no || null
       };
     } catch (error) {
-      this.toastr.error('Failed to load profile data');
+      this.toastService.showToast('Failed to load profile data','error');
       console.error('Profile load error:', error);
     } finally {
       this.isLoading = false;
@@ -78,10 +78,10 @@ export class SidebarComponent implements OnInit {
   async logout() {
     try {
       await this.authService.logout();
-      this.toastr.success('Logged out successfully');
+      this.toastService.showToast('Logged out successfully','success');
       this.router.navigate(['/']);
     } catch (error) {
-      this.toastr.error('Failed to logout. Please try again.');
+      this.toastService.showToast('Failed to logout. Please try again.','error');
       console.error('Logout error:', error);
     }
   }
@@ -89,6 +89,6 @@ export class SidebarComponent implements OnInit {
   toggleSidebar() {
     this.isCollapsed = !this.isCollapsed;
     const message = this.isCollapsed ? 'Sidebar collapsed' : 'Sidebar expanded';
-    this.toastr.info(message, '', { timeOut: 1000 });
+    this.toastService.showToast(message, 'info');
   }
 }

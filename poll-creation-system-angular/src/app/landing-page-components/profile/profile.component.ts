@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ProfileService } from '../../services/profile.service';
+import { ToastService } from '../../services/toast.service';
 
 interface FormErrors {
   first_name: string;
@@ -71,7 +72,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private profileService: ProfileService,
     private router: Router,
-    private toastr: ToastrService
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -89,7 +90,7 @@ export class ProfileComponent implements OnInit {
       };
     } catch (error) {
       console.error('Error fetching profile:', error);
-      this.toastr.error('Failed to load profile data');
+      this.toastService.showToast('Failed to load profile data','error');
     }
   }
 
@@ -141,21 +142,21 @@ export class ProfileComponent implements OnInit {
 
     // Check for any validation errors
     if (Object.values(this.formErrors).some(error => error !== '')) {
-      this.toastr.warning('Please fix the validation errors');
+      this.toastService.showToast('Please fix the validation errors','info');
       return;
     }
 
     try {
       await this.profileService.updateProfile(this.user);
       this.isEditing = false;
-      this.toastr.success('Profile updated successfully!');
+      this.toastService.showToast('Profile updated successfully!','success');
       this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
         this.router.navigate(['/home/profile']);
       });
       this.getUserProfile();
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      this.toastr.error(error.message || 'Failed to update profile.');
+      this.toastService.showToast(error.message || 'Failed to update profile.','error');
     }
   }
 }

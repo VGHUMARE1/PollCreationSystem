@@ -20,107 +20,96 @@
       </p>
     </div>
 
-    <div class="poll-grid">
-      <ng-container *ngFor="let poll of displayedPolls">
-        <div class="poll-card">
-          <div class="card-header">
-            <div
-              class="poll-type"
-              [ngClass]="{
-                multi: poll.allowMultiple,
-                single: !poll.allowMultiple
-              }"
-            >
-              {{ poll.allowMultiple ? "MULTIPLE" : "SINGLE" }}
-            </div>
-            <h2 class="question">{{ poll.question }}</h2>
-            <div class="poll-meta">
-              <span><i class="fas fa-user-edit"></i> {{ poll.createdBy }}</span>
-              <span
-                ><i class="fas fa-hourglass-half"></i>
-                {{ poll.expiryDate }}</span
+    
+      <div class="poll-grid">
+        <ng-container *ngFor="let poll of displayedPolls">
+          <div class="poll-card">
+            <div class="card-header">
+              <div
+                class="poll-type"
+                [ngClass]="{
+                  multi: poll.allowMultiple,
+                  single: !poll.allowMultiple
+                }"
               >
+                {{ poll.allowMultiple ? "MULTIPLE" : "SINGLE" }}
+              </div>
+              <h2 class="question">{{ poll.question }}</h2>
+              <div class="poll-meta">
+                <span><i class="fas fa-user-edit"></i> {{ poll.createdBy }}</span>
+                <span
+                  ><i class="fas fa-hourglass-half"></i>
+                  {{ poll.expiryDate }}</span
+                >
+              </div>
+            </div>
+    
+            <!-- Multiple Choice Options -->
+            <ng-container *ngIf="poll.allowMultiple">
+              <div
+                *ngFor="
+                  let option of poll.options;
+                  let i = index;
+                  trackBy: trackByOption
+                "
+                class="option"
+              >
+                <label>
+                  <input
+                    type="checkbox"
+                    [name]="'poll_' + poll._id"
+                    [(ngModel)]="poll.selectedOptions![i]"
+                    [disabled]="poll.userVoted"
+                  />
+                  <span class="custom-control"></span>
+                  <span class="option-text">{{ option.optionText }}</span>
+                  <span *ngIf="poll.userVoted && poll.selectedOptions![i]" class="selected-indicator">
+                    <i class="fas fa-check"></i> Your vote
+                  </span>
+                </label>
+              </div>
+            </ng-container>
+    
+            <!-- Single Choice Options -->
+            <ng-container *ngIf="!poll.allowMultiple">
+              <div
+                *ngFor="let option of poll.options; trackBy: trackByOption"
+                class="option"
+              >
+                <label>
+                  <input
+                    type="radio"
+                    [name]="'poll_' + poll._id"
+                    [(ngModel)]="poll.selectedOption"
+                    [value]="option.id"
+                    [disabled]="poll.userVoted"
+                  />
+                  <span class="custom-control"></span>
+                  <span class="option-text">{{ option.optionText }}</span>
+                  <span *ngIf="poll.userVoted && poll.selectedOption === option.id" class="selected-indicator">
+                    <i class="fas fa-check"></i> Your vote
+                  </span>
+                </label>
+              </div>
+            </ng-container>
+    
+            <div class="card-footer">
+              <div class="votes">
+                <i class="fas fa-chart-pie"></i>
+                <span>{{ poll.totalVotes }} votes</span>
+              </div>
+              <button 
+                class="submit-btn" 
+                (click)="vote(poll)"
+                [disabled]="poll.userVoted"
+              >
+                <i class="fas fa-paper-plane"></i>
+                <span>{{ poll.userVoted ? 'Already Voted' : 'Cast Vote' }}</span>
+              </button>
             </div>
           </div>
-
-          <!-- Multiple Choice Options -->
-          <ng-container *ngIf="poll.allowMultiple">
-            <div
-              *ngFor="
-                let option of poll.options;
-                let i = index;
-                trackBy: trackByOption
-              "
-              class="option"
-            >
-              <label>
-                <input
-                  type="checkbox"
-                  [name]="'poll_' + poll._id"
-                  [(ngModel)]="poll.selectedOptions![i]"
-                />
-                <span class="custom-control"></span>
-                <span class="option-text">{{ option.optionText }}</span>
-              </label>
-            </div>
-          </ng-container>
-
-          <!-- Single Choice Options -->
-          <ng-container *ngIf="!poll.allowMultiple">
-            <div
-              *ngFor="let option of poll.options; trackBy: trackByOption"
-              class="option"
-            >
-              <label>
-                <input
-                  type="radio"
-                  [name]="'poll_' + poll._id"
-                  [(ngModel)]="poll.selectedOption"
-                  [value]="option.id"
-                />
-                <span class="custom-control"></span>
-                <span class="option-text">{{ option.optionText }}</span>
-              </label>
-            </div>
-          </ng-container>
-
-          <div class="card-footer">
-            <div class="votes">
-              <i class="fas fa-chart-pie"></i>
-              <span>{{ poll.totalVotes }} votes</span>
-            </div>
-            <button class="submit-btn" (click)="vote(poll)">
-              <i class="fas fa-paper-plane"></i>
-              <span>Cast Vote</span>
-            </button>
-          </div>
-        </div>
-      </ng-container>
-    </div>
-
-    <div class="pagination">
-      <button
-        class="nav-btn prev"
-        (click)="prevPage()"
-        [disabled]="currentPage === 1"
-      >
-        <i class="fas fa-chevron-left"></i>
-      </button>
-
-      <div class="page-numbers">
-        <ng-container *ngFor="let page of getPageRange()">
-          <button
-            *ngIf="page !== -1"
-            class="page-btn"
-            [class.active]="page === currentPage"
-            (click)="goToPage(page)"
-          >
-            {{ page }}
-          </button>
-          <span *ngIf="page === -1" class="ellipsis">...</span>
         </ng-container>
-      </div>
-
+      
       <button
         class="nav-btn next"
         (click)="nextPage()"

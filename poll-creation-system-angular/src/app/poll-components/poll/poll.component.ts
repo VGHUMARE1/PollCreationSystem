@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PollService } from '../../services/poll.service';
-import { ToastrService } from 'ngx-toastr';
+import { ToastService } from '../../services/toast.service';
 
 interface Voter {
   email: string;
@@ -67,7 +67,7 @@ export class PollComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private pollService: PollService,
-    private toastr: ToastrService
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -100,7 +100,7 @@ export class PollComponent implements OnInit {
     } catch (error) {
       // console.error('Poll fetch error:', error);
       this.errorMessage = 'Failed to load poll. Please try again.';
-      this.toastr.error('Failed to load poll. Please try again.');
+      this.toastService.showToast('Failed to load poll. Please try again.','error');
     } finally {
       this.isLoading = false;
     }
@@ -113,23 +113,23 @@ export class PollComponent implements OnInit {
       const optionIds = this.getSelectedOptionIds();
       const response = await this.pollService.submitVote(this.pollId, optionIds);
       this.hasVoted = true;
-      this.toastr.success(response.message || 'Your vote has been submitted successfully!', 'success');
+      this.toastService.showToast(response.message || 'Your vote has been submitted successfully!', 'success');
       await this.fetchPoll();
       this.router.navigate(['/home/voted-polls']);
     } catch (error: any) {
       // console.error('Vote submission error:', error);
-      this.toastr.error( error.response?.data?.message || 'Failed to submit vote. Please try again.');
+      this.toastService.showToast( error.response?.data?.message || 'Failed to submit vote. Please try again.');
     }
   }
 
   private validateVote(): boolean {
     if (this.poll.allowMultiple) {
       if (!this.poll.selectedOptions?.some(selected => selected)) {
-        this.toastr.info('Please select at least one option', 'warning');
+        this.toastService.showToast('Please select at least one option', 'info');
         return false;
       }
     } else if (this.poll.selectedOption === undefined) {
-      this.toastr.info('Please select an option', 'warning');
+      this.toastService.showToast('Please select an option', 'info');
       return false;
     }
     return true;

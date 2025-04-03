@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-my-polls',
@@ -29,7 +30,7 @@ export class MyPollsComponent implements OnInit {
   constructor(
     private router: Router,
     private pollService: PollService,
-    private toastr: ToastrService
+    private toastService: ToastService
   ) {}
 
   async ngOnInit() {
@@ -43,11 +44,11 @@ export class MyPollsComponent implements OnInit {
       this.myPolls = response.data;
       this.calculateTotalPages();
       if (this.myPolls.length === 0) {
-        this.toastr.info('You have not created any polls yet');
+        this.toastService.showToast('You have not created any polls yet','info');
       }
     } catch (error) {
       console.error('Error fetching polls:', error);
-      this.toastr.error('Failed to load your polls. Please try again later.');
+      this.toastService.showToast('Failed to load your polls. Please try again later.','error');
       this.myPolls = [];
       this.totalPages = 0;
     } finally {
@@ -75,14 +76,14 @@ export class MyPollsComponent implements OnInit {
   prevPage() {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.toastr.info(`Showing page ${this.currentPage}`, '', { timeOut: 1000 });
+      this.toastService.showToast(`Showing page ${this.currentPage}`, 'info');
     }
   }
 
   nextPage() {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.toastr.info(`Showing page ${this.currentPage}`, '', { timeOut: 1000 });
+      this.toastService.showToast(`Showing page ${this.currentPage}`, 'info');
     }
   }
 
