@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { PollService } from '../../services/poll.service';
 import { Poll, Option } from '../../model/poll.model';
-import { ToastrService } from 'ngx-toastr';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
@@ -17,14 +15,13 @@ import { ToastService } from '../../services/toast.service';
 export class ActivePollsComponent implements OnInit {
   allPolls: Poll[] = [];
   displayedPolls: Poll[] = [];
-  currentPage: number = 1;
-  pollsPerPage: number = 2;
-  totalPages: number = 1;
-  isLoading: boolean = false;
+  currentPage = 1;
+  pollsPerPage = 2;
+  totalPages = 1;
+  isLoading = false;
   errorMessage: string | null = null;
-  
+
   constructor(
-    private router: Router, 
     private pollService: PollService,
     private toastService: ToastService
   ) {}
@@ -38,36 +35,26 @@ export class ActivePollsComponent implements OnInit {
     this.errorMessage = null;
     
     try {
-      this.allPolls = await this.pollService.getActivePolls();
-      this.initializePollSelections();
+      const polls = await this.pollService.getActivePolls();
+      this.allPolls = polls.map(poll => this.initializePoll(poll));
       this.totalPages = Math.ceil(this.allPolls.length / this.pollsPerPage);
       this.updateDisplayedPolls();
     } catch (error) {
       this.errorMessage = 'Failed to load polls. Please try again later.';
-      this.toastService.showToast('Failed to load polls. Please try again later.', 'error');
+      this.toastService.showToast(this.errorMessage, 'error');
     } finally {
       this.isLoading = false;
     }
   }
 
-  private initializePollSelections(): void {
-    this.allPolls.forEach(poll => {
-      if (poll.allowMultiple) {
-        poll.selectedOptions = poll.options.map(() => false);
-        if (poll.userVoted && Array.isArray(poll.selectedOptions)) {
-          poll.selectedOptions = poll.options.map(option => 
-            poll.selectedOptions?.some(selected => 
-              typeof selected !== 'boolean' && selected.id === option.id
-            ) || false
-          );
-        }
-      } else {
-        if (poll.userVoted && Array.isArray(poll.selectedOptions) ){
-          const firstSelected = poll.selectedOptions.find(opt => true);
-          poll.selectedOption = typeof firstSelected !== 'boolean' ? firstSelected?.id : null;
-        }
-      }
-    });
+  private initializePoll(poll: Poll): Poll {
+    return {
+      ...poll,
+      selectedOptions: poll.allowMultiple 
+        ? poll.selectedOptions || new Array(poll.options.length).fill(false)
+        : [],
+      selectedOption: poll.selectedOption ?? null
+    };
   }
 
   private updateDisplayedPolls(): void {
@@ -76,6 +63,57 @@ export class ActivePollsComponent implements OnInit {
     this.displayedPolls = this.allPolls.slice(startIndex, endIndex);
   }
 
+  async vote(poll: Poll): Promise<void> {
+    if (poll.userVoted || !this.validateVote(poll)) return;
+
+    try {
+      const optionIds = this.getSelectedOptionIds(poll);
+      console.log(optionIds)
+      console.log(poll)
+      const response = await this.pollService.submitVote(poll._id+"", optionIds);
+      this.toastService.showToast(response.message, 'success');
+      await this.fetchActivePolls();
+    } catch (error: any) {
+      this.handleVoteError(error);
+    }
+  }
+
+  private validateVote(poll: Poll): boolean {
+    if (poll.allowMultiple) {
+      const selectedCount = poll.selectedOptions.filter(opt => opt !== null).length;
+      if (selectedCount === 0) {
+        this.toastService.showToast('Please select at least one option', 'info');
+        return false;
+      }
+    } else if (poll.selectedOption === null) {
+      this.toastService.showToast('Please select an option', 'info');
+      return false;
+    }
+    return true;
+  }
+
+  private getSelectedOptionIds(poll: Poll): number[] {
+    if (poll.allowMultiple) {
+      if (!poll.selectedOptions || !Array.isArray(poll.selectedOptions)) {
+        return [];
+      }
+      // Get IDs of selected options (where checkbox is true)
+      return poll.options
+        .filter((_, index) => poll.selectedOptions[index])
+        .map(option => option.id);
+    } else {
+      return poll.selectedOption !== null ? [poll.selectedOption] : [];
+    }
+  }
+
+  private handleVoteError(error: any): void {
+    const message = error.response?.data?.message || 
+                   error.message || 
+                   'An error occurred while submitting your vote.';
+    this.toastService.showToast(message, 'error');
+  }
+
+  // Pagination methods remain the same
   nextPage(): void {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
@@ -105,79 +143,26 @@ export class ActivePollsComponent implements OnInit {
     const maxVisible = 5;
     
     if (this.totalPages <= maxVisible) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        range.push(i);
-      }
-    } else {
-      const start = Math.max(1, this.currentPage - 2);
-      const end = Math.min(this.totalPages, this.currentPage + 2);
-      
-      if (start > 1) range.push(1);
-      if (start > 2) range.push(-1);
-      
-      for (let i = start; i <= end; i++) {
-        range.push(i);
-      }
-      
-      if (end < this.totalPages - 1) range.push(-1);
-      if (end < this.totalPages) range.push(this.totalPages);
+      return Array.from({length: this.totalPages}, (_, i) => i + 1);
     }
     
+    const start = Math.max(1, this.currentPage - 2);
+    const end = Math.min(this.totalPages, this.currentPage + 2);
+    
+    if (start > 1) range.push(1);
+    if (start > 2) range.push(-1);
+    
+    for (let i = start; i <= end; i++) range.push(i);
+    
+    if (end < this.totalPages - 1) range.push(-1);
+    if (end < this.totalPages) range.push(this.totalPages);
+    
     return range;
-  }
-
-  async vote(poll: Poll): Promise<void> {
-    if (poll.userVoted) {
-      this.toastService.showToast('You have already voted on this poll', 'info');
-      return;
-    }
-
-    if (!this.validateVote(poll)) {
-      return;
-    }
-
-    try {
-      const optionIds = this.getSelectedOptionIds(poll);
-      const response = await this.pollService.submitVote(poll._id, optionIds);
-      this.toastService.showToast(response.message, 'success');
-      await this.fetchActivePolls();
-    } catch (error: any) {
-      this.handleVoteError(error);
-    }
-  }
-
-  private validateVote(poll: Poll): boolean {
-    if (poll.allowMultiple) {
-      const selectedCount = poll.selectedOptions?.filter(opt => opt === true).length || 0;
-      if (selectedCount === 0) {
-        this.toastService.showToast('Please select at least one option', 'info');
-        return false;
-      }
-    } else if (poll.selectedOption === null || poll.selectedOption === undefined) {
-      this.toastService.showToast('Please select an option', 'info');
-      return false;
-    }
-    return true;
-  }
-
-  private getSelectedOptionIds(poll: Poll): number[] {
-    if (poll.allowMultiple) {
-      return poll.options
-        .filter((_, index) => poll.selectedOptions?.[index] === true)
-        .map(option => option.id);
-    } else {
-      return poll.selectedOption !== null && poll.selectedOption !== undefined 
-        ? [poll.selectedOption] 
-        : [];
-    }
-  }
-
-  private handleVoteError(error: any): void {
-    const message = error.error?.message || error.message || "An error occurred while submitting your vote.";
-    this.toastService.showToast(message, 'error');
   }
 
   trackByOption(index: number, option: Option): number {
     return option.id;
   }
+
+  
 }

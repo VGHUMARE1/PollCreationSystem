@@ -91,9 +91,9 @@
         </thead>
         <tbody>
           <tr *ngFor="let voter of voters">
-            <td>{{ voter.name || 'Anonymous' }}</td>
-            <td>{{ voter.email || 'N/A' }}</td>
-            <td>{{ getVotedOptionText(voter.votedOptionId) }}</td>
+            <td>{{ voter.name }}</td>
+            <td>{{ voter.email }}</td>
+            <td>{{ getVotedOptionText(voter.votes) }}</td>
           </tr>
           <tr *ngIf="voters.length === 0">
             <td colspan="3" class="no-voters">No voters have participated yet</td>

@@ -13,31 +13,6 @@
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-.no-polls-message {
-  text-align: center;
-  padding: 2rem;
-  background: rgba(57, 62, 70, 0.5);
-  border-radius: 10px;
-  margin: 2rem 0;
-  color: var(--text-light);
-}
-
-.no-polls-message i {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: var(--primary);
-}
-
-.no-polls-message h3 {
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-}
-
-.no-polls-message p {
-  opacity: 0.8;
-  font-size: 1rem;
-}
-
 .polls-app {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--dark) 0%, #2a313b 100%);
@@ -169,11 +144,23 @@
   margin-right: 0.5rem;
 }
 
-/* Poll Options */
-.options {
-  padding: 0 1.5rem 1.5rem;
+.voted-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.3rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
+.voted-badge i {
+  margin-right: 0.5rem;
+}
+
+/* Poll Options */
 .option {
   margin-bottom: 1rem;
 }
@@ -232,6 +219,20 @@ input:checked + .custom-control::after {
   flex: 1;
 }
 
+/* Disabled State */
+.poll-card input:disabled {
+  cursor: not-allowed;
+}
+
+.poll-card input:disabled + .custom-control {
+  opacity: 0.6;
+  border-color: #ccc;
+}
+
+.poll-card input:disabled ~ .option-text {
+  color: #666;
+}
+
 /* Card Footer */
 .card-footer {
   display: flex;
@@ -265,9 +266,15 @@ input:checked + .custom-control::after {
   box-shadow: 0 4px 15px rgba(0, 173, 181, 0.4);
 }
 
-.submit-btn:hover {
+.submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 173, 181, 0.6);
+}
+
+.submit-btn:disabled {
+  background: rgba(57, 62, 70, 0.7);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Pagination */
@@ -328,6 +335,60 @@ input:checked + .custom-control::after {
   background: rgba(57, 62, 70, 0.7);
 }
 
+.ellipsis {
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+}
+
+/* Loading and No Polls States */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--primary);
+  font-size: 1.2rem;
+}
+
+.loading-spinner i {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.no-polls-message {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(57, 62, 70, 0.5);
+  border-radius: 10px;
+  margin: 2rem 0;
+  color: var(--text-light);
+}
+
+.no-polls-message i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: var(--primary);
+}
+
+.no-polls-message h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.no-polls-message p {
+  opacity: 0.8;
+  font-size: 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
   .poll-grid {
@@ -385,4 +446,28 @@ input:checked + .custom-control::after {
   .question {
     font-size: 1.1rem;
   }
+}
+
+.custom-control.checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.option-text.selected {
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.check-mark {
+  margin-left: 8px;
+  color: var(--primary);
+}
+
+input[type="checkbox"]:checked + .custom-control::after {
+  content: '';
+  display: block;
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 2px;
 }

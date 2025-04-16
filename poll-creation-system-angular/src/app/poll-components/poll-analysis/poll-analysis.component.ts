@@ -75,11 +75,24 @@ async loadPollData() {
   try {
     const response = await this.pollService.getPollDetails(this.pollId);
     this.poll = response.data;
-    this.voters = this.poll?.voters || [];
+    
+    // Group votes by user
+    const voterMap = new Map();
+    this.poll?.voters?.forEach((voter: any) => {
+      if (!voterMap.has(voter.email)) {
+        voterMap.set(voter.email, {
+          name: voter.name || 'Anonymous',
+          email: voter.email || 'N/A',
+          votes: []
+        });
+      }
+      voterMap.get(voter.email).votes.push(voter.votedOptionId);
+    });
+    
+    this.voters = Array.from(voterMap.values());
     this.pollCreator = this.poll?.creator || {};
     this.initializeCharts();
   } catch (error) {
-    // console.error('Error loading poll data:', error);
     this.errorLoading = true;
     this.toastService.showToast('Failed to load poll data', 'error');
     this.router.navigate(['/home/my-polls']);
@@ -160,8 +173,14 @@ copyPollLink() {
     this.router.navigate([`/home/edit-poll/${this.pollId}`]);
   }
 
-  getVotedOptionText(votedOptionId: number): string {
-    const option = this.poll?.options.find((opt: any) => opt.id === votedOptionId);
-    return option?.optionText || 'Unknown option';
+  getVotedOptionText(votedOptionIds: number[]): string {
+    if (!this.poll?.options) return 'Unknown option';
+    
+    return votedOptionIds
+      .map(id => {
+        const option = this.poll.options.find((opt: any) => opt.id === id);
+        return option?.optionText || 'Unknown option';
+      })
+      .join(', ');
   }
 }

@@ -4,7 +4,7 @@ export interface Option {
 }
 
 export interface Poll {
-  _id: string;  
+  _id: number;
   question: string;
   createdBy: string;
   expiryDate: string;
@@ -12,6 +12,6 @@ export interface Poll {
   allowMultiple: boolean;
   options: Option[];
   userVoted: boolean;
-  selectedOptions?: (Option | boolean)[]; 
-  selectedOption?: number | null;
+  selectedOptions: (boolean | Option)[]; // Can be either boolean or Option
+  selectedOption: number | null;
 }

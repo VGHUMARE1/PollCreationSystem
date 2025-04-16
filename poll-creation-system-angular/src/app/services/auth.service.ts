@@ -41,25 +41,38 @@ export class AuthService {
         { withCredentials: true }
       );
 
-      // console.log(response);
+      console.log(response);
       if (response.data) {
-        // console.log(response.data.user);
+        console.log(response.data.user);
         this.cookieService.set('session', 'true', { path: '/' });
-        this.cookieService.set('user', response.data.user, { path: '/' });
+        this.cookieService.set('user',JSON.stringify(response.data.user) , { path: '/' });
+        this.cookieService.set('JWTToken',response.data.token , { path: '/' });
+        console.log(this.cookieService.get('user'))
       }
       return response;
     } catch (error) {
-      // console.log( error);
+      console.log( error);
       throw error;
     }
   }
 
-  async logout() {
-    const response = await axios.get(`${this.apiUrl}/logout`, {
-      withCredentials: true,
-    });
-    // console.log(response);
+  async logout(): Promise<void> {
+    try {
+      const response = await axios.get(`${this.apiUrl}/logout`, {
+        withCredentials: true,
+      });
+      this.clearAuthData();
+    } catch (error) {
+      this.clearAuthData();
+      throw error;
+    }
+  }
+  
+  private clearAuthData(): void {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data');
     this.cookieService.delete('session', '/');
+    this.cookieService.delete('user', '/');
   }
 
   isLoggedIn(): boolean {
