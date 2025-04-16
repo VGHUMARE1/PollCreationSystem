@@ -6,6 +6,11 @@ const authControllers=require("../controllers/authController")
 const router = express.Router();
 
 
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = 'your_jwt_secret_key'; // Must match the key used to sign tokens
+
+
 router.post('/email/send', authControllers.sendEmail);
 
 
@@ -23,5 +28,12 @@ router.get("/logout", authControllers.logout);
 
 // Edit Profile Route
 router.put('/editprofile',isLoggedIn, authControllers.editProfile);
+
+
+
+
+// API endpoint for Spring Boot to verify tokens
+router.post('/verify-jwt', authControllers.verifyJWTToken);
+
 
 module.exports = router;

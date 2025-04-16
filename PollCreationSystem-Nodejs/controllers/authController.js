@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const User = require("../models/User");
 const axios=require("axios")
+const jwt = require('jsonwebtoken');
 
 function decryptData(encryptedData, secretKey) {
   const bytes = CryptoJS.AES.decrypt(encryptedData, secretKey);
@@ -38,30 +39,56 @@ module.exports.register=async (req, res) => {
   }
 
 
-  module.exports.login= (req, res, next) => {
-    const { email, password } = req.body;
+  
+  module.exports.login = (req, res, next) => {
+      const { email, password } = req.body;
+      
+      const secretKey = 'topSecret';
+      const jwtSecret = 'your_jwt_secret_key'; // Should be different from your encryption key
     
-    const secretKey =  'topSecret';
-  
-    const decryptedEmail = decryptData(email, secretKey);
-    const decryptedPassword = decryptData(password, secretKey);
-  
-    req.body.password = decryptedPassword;
-    console.log(req.body);
-    passport.authenticate("local", (err, user, info) => {
-      if (err) return res.status(500).json({ msg: "Server error", error: err });
-  
-      if (!user) {
-        return res.status(400).json({ msg: info.message });
-      }
-  
-      req.logIn(user, (err) => {
-        if (err) return res.status(500).json({ msg: "Session error", error: err });
-  
-        return res.json({ msg: "Logged in successfully", user });
-      });
-    })(req, res, next);
-  }
+      // const decryptedEmail = decryptData(email, secretKey);
+      const decryptedPassword = decryptData(password, secretKey);
+    
+      // req.body.email = decryptedEmail; // Make sure to use the decrypted email
+      req.body.password = decryptedPassword;
+      
+      passport.authenticate("local", (err, user, info) => {
+          if (err) return res.status(500).json({ msg: "Server error", error: err });
+      
+          if (!user) {
+              return res.status(400).json({ msg: info.message });
+          }
+      
+          req.logIn(user, (err) => {
+              if (err) return res.status(500).json({ msg: "Session error", error: err });
+             
+              const token = jwt.sign(
+                  { 
+                      id: user._id, 
+                      email: user.email,
+                      
+                     
+                  }, 
+                  jwtSecret,
+                  { expiresIn: '1h' } 
+              );
+              
+             
+              return res.json({ 
+                  msg: "Logged in successfully", 
+                  user: {
+                      id: user._id,
+                      email: user.email,
+                      first_name:user.first_name,
+                      last_name:user.last_name,
+                      phone_no:user.phone_no,
+                      
+                  },
+                  token 
+              });
+          });
+      })(req, res, next);
+  };
 
   module.exports.logout=(req, res) => {
     req.logout(() => {
@@ -166,3 +193,53 @@ module.exports.register=async (req, res) => {
       }
     }
   }
+
+  module.exports.verifyJWTToken = (req, res) => {
+    try {
+      console.log("Auth Header Request :" + req.headers['authorization']);
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+        
+        console.log("Token recieved from angular: " + token);
+        if (!token) {
+            return res.status(401).json({
+                isValid: false, 
+                message: 'No token provided'
+            });
+        }
+
+        const decoded = jwt.verify(token, 'your_jwt_secret_key');
+        
+        console.log("Decoded Messages : " + decoded.email);
+        return res.json({
+            isValid: true,
+            message: 'Token is valid',
+            user: {
+                email: decoded.email
+            }
+        });
+
+    } catch (err) {
+        let message = 'Invalid token';
+        if (err.name === 'TokenExpiredError') {
+            message = 'Token has expired';
+        } else if (err.name === 'JsonWebTokenError') {
+            message = 'Malformed token';
+        }
+       console.log("error msg "+message);
+        return res.status(401).json({
+            isValid: false,
+            message: message
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
+  
