@@ -1,0 +1,4 @@
+{
+    "nodeAPI":"http://localhost:3000/auth",
+    "springAPI":"http://localhost:8080"
+}
