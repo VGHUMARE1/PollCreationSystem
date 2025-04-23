@@ -43,16 +43,4 @@ The system is composed of **three main services**, each containerized via Docker
 
 Follow these steps to get the application up and running:
 
-### 1️⃣ Extract and Navigate
 
-Unzip the project and navigate into the root directory:
-
-```bash
-unzip PollCreationSystem.zip
-cd PollCreationSystem
-Run Docker Compose
-Use the following command to build and run all containers:
-docker compose up --build
-
-
-The project will be accessible with link http://localhost:4200
